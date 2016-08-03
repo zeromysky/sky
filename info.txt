@@ -1,0 +1,37 @@
+Python字符串的编码与解码(encode与decode)
+
+首先要搞清楚，字符串在Python内部的表示是unicode编码，因此，在做编码转换时，通常需要以unicode作为中间编码，即先将其他编码的字符串解码（decode）成unicode，再从unicode编码（encode）成另一种编码。
+
+decode的作用是将其他编码的字符串转换成unicode编码，如str1.decode('gb2312')，表示将gb2312编码的字符串转换成unicode编码。
+
+encode的作用是将unicode编码转换成其他编码的字符串，如str2.encode('gb2312')，表示将unicode编码的字符串转换成gb2312编码。
+
+在某些IDE中，字符串的输出总是出现乱码，甚至错误，其实是由于IDE的结果输出控制台自身不能显示字符串的编码，而不是程序本身的问题。
+
+例如：ljq.py，编码为utf8，包含内容如下：
+
+复制代码
+#-*-coding:utf-8-*- 
+
+s='中文'
+print type(s) #查看s的字符类型
+print s  
+
+s.decode('utf8') #解码utf8，默认的编码方式是unicode
+s.decode('gbk', "ignore") #解码utf8，忽略其中有异常的编码，仅显示有效的编码
+s.decode('gbk', 'replace')
+print type(s)
+print s
+
+s.encode('gb2312') ##编码为utf8
+print type(s)
+print s
+复制代码
+ljq.py编码必需与s.decode('utf8')指定的编码一致，不然会抛出解码异常信息，可以通过s.decode("gbk", "ignore")或s.decode("gbk", "replace")来解决。
+
+另外对于一些包含特殊字符的编码，直接解码可能会报错，可以使用对于的参数来设置。如:
+s.decode("utf-8", "ignore") 忽略其中有异常的编码，仅显示有效的编码
+s.decode("utf-8", "replace") 替换其中异常的编码，这个相对来可能一眼就知道那些字符编码出问题了。
+
+从unicode转str，被看做是把一个信息文本编码为二进制字节流的过程，要用encode方法
+
