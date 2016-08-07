@@ -1,0 +1,121 @@
+#!/usr/bin/python
+#-*-coding:utf-8-*-
+import sys
+import urllib 
+import urllib2 
+import httplib
+import time 
+import re
+
+class KUtil(object):
+
+    @staticmethod
+    def out (str):
+        if isinstance(str,list) :
+            for i in str :
+                print i
+        elif isinstance(str,dict):
+            for i in str:
+                print i+":"+str[i]
+        else:
+            print str
+    
+    @staticmethod    
+    def file_get_contents (url):
+        f = open (url) 
+        datastr=f.read()
+        f.close()
+        return datastr
+    @staticmethod   
+    def file_put_contents (url,datastr,mode='w'):
+        f = open (url,mode) 
+        f.write(datastr)
+        f.close()
+
+    @staticmethod 
+    def httpGet(url,data=None):
+
+        if(data!=None):
+            params = urllib.urlencode(data)
+            f = urllib.urlopen(url+"%s" % params)
+
+        f = urllib.urlopen(url)
+        return f.read()
+
+    @staticmethod 
+    def httpPost(url,data=None):
+
+        if(data!=None):
+            params = urllib.urlencode(data)
+            f = urllib.urlopen(url,params)
+
+        f = urllib.urlopen(url)
+        return f.read()
+
+    @staticmethod
+    def http_post(requrl,data):
+        res = None
+        try:
+            test_data_urlencode = urllib.urlencode(data)
+            req = urllib2.Request(url = requrl,data =test_data_urlencode)
+            res_data = urllib2.urlopen(req)
+            res = res_data.read()
+        except Exception, e:
+            return res
+        else:
+            pass
+        finally:
+            pass
+        
+        return res
+
+
+    @staticmethod
+    def http_post_1():
+        test_data = {'ServiceCode':'aaaa','b':'bbbbb'}
+        test_data_urlencode = urllib.urlencode(test_data)
+        requrl = "http://192.168.81.16/cgi-bin/python_test/test.py"
+        headerdata = {"Host":"192.168.81.16"}
+        conn = httplib.HTTPConnection("192.168.81.16")
+        conn.request(method="POST",url=requrl,body=test_data_urlencode,headers = headerdata)
+        response = conn.getresponse()
+        res= response.read()
+        print res
+
+   
+    #时间戳转日期
+    @staticmethod
+    def timeToStr(time_stamp=None,format='%Y-%m-%d %H:%M:%S'):
+        if time_stamp==None:
+            return time.strftime(format,time.localtime(time.time()))
+        else:
+            return time.strftime(format,time.localtime(time_stamp))
+    #日期转时间戳
+    @staticmethod
+    def strToTime(time_str,format='%Y-%m-%d %H:%M:%S'):
+        if time_str==None: return;
+        time.strptime(time_str, format)
+        s = time.mktime(time.strptime(time_str, format))
+        return int(s)
+    #邮箱验证
+    @staticmethod
+    def emailVerify(email):
+
+        if len(email) > 7:
+            if re.match("^[\w\-\.]+@[\w\-\.]+[\.\w+]+$", email) != None:
+                return 1
+        return 0
+        
+        
+        
+   while not self.qdata.empty():
+   
+    try:
+       
+        var = self.qdata.get(block=False)
+     
+    except Exception, e:
+        if self.qdata.empty() :
+            break
+    finally:
+    	pass
