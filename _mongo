@@ -1,0 +1,570 @@
+
+
+show dbs; 查询所有数据库
+
+use yourDB;  当创建一个集合(table)的时候会自动创建当前数据库
+
+db.getName();  查看当前使用的数据库
+
+db.dropDatabase(); 删除当前使用数据库
+
+db.repairDatabase(); 修复当前数据库
+
+db.stats(); 显示当前db状态
+
+db.version(); 当前db版本
+
+db.getMongo(); 查看当前db的链接机器地址
+
+创建一个聚集集合（table）
+
+db.createCollection(“collName”, {size: 20, capped: 5, max: 100});
+
+得到指定名称的聚集集合（table）
+
+db.getCollection("account");
+
+得到当前db的所有聚集集合
+
+db.getCollectionNames();
+
+显示当前db所有聚集索引的状态
+
+db.printCollectionStats();
+
+============查詢===============
+
+DBQuery.shellBatchSize= 10  		显示的条数  默认是20
+
+db.collection.find().pretty();
+
+db.collection.distinct("name");  	去掉重复项
+
+
+db.collection.find({"age": 22});        age = 22
+db.collection.find({age: {$gt: 22}});   age > 22
+db.collection.find({age: {$lt: 22}});   age < 22
+db.collection.find({age: {$gte: 22}});  age >= 22
+db.collection.find({age: {$lte: 22}});  age <= 22
+db.collection.find({age: {$gte: 23, $lte: 26}});   age >= 23 并且 age <= 26
+
+db.collection.find( { x : { $ne : 3 } } ); 不等于 $ne
+
+db.collection.find({name: /mongo/});   正则
+
+db.collection.find({name: 'zhangsan', age: 22});  name = ‘zhangsan’ and age = ‘22’
+
+
+db.collection.find({}, {name: 1, age: 1});   	查询指定列name、age数据
+
+db.collection.find().sort({age: 1});  			按照年龄排序  升序   -1：降序
+
+db.collection.find().limit(5);   					查询前5条数据
+db.collection.find().skip(10);   					查询10条以后的数据
+
+
+
+db.collection.find({$or: [{age: 22}, {age: 25}]});  age = 22 or age = 25;
+db.collection.findOne();   <=>   db.collection.find().limit(1);
+db.collection.find({age: {$gte: 25}}).count(true); 记录条数
+
+db.collection.find().limit(10).skip(5);  查询在5-10之间的数据  可用于分页，limit是pageSize，skip是第几页*pageSize
+  
+=========添加============
+
+db.collection.save({name: ‘zhangsan’, age: 25, sex: true});   存在会更新
+
+db.fruit.insert({"apple":1, "banana": 4, "peach" : 4})
+
+==========修改============
+
+db.collection.update(criteria, objNew, upsert, multi )
+
+criteria:update的查询条件，类似sql update查询内where后面的
+
+objNew:update的对象和一些更新的操作符（如$,$inc...）等，也可以理解为sql update查询内set后面的。
+
+upsert : 如果不存在update的记录，是否插入objNew,true为插入，默认是false，不插入。
+
+multi : mongodb默认是false,只更新找到的第一条记录，如果这个参数为true,就把按条件查出来多条记录全部更新。
+
+ 
+
+db.users.update({age: 25}, {$set: {name: 'changeName'}}, false, true);
+
+相当于：update users set name = ‘changeName’ where age = 25;
+
+ 
+
+db.users.update({name: 'Lisi'}, {$inc: {age: 50}}, false, true);
+
+相当于：update users set age = age + 50 where name = ‘Lisi’;
+
+ 
+
+db.users.update({name: 'Lisi'}, {$inc: {age: 50}, $set: {name: 'hoho'}}, false, true);
+
+相当于：update users set age = age + 50, name = ‘hoho’ where name = ‘Lisi’;
+
+ 
+==========删除==========
+
+db.users.remove({age: 132});
+
+db.time_task.insert({
+"add_time" : "2016-04-22 14:50:00",
+"category_title" : "other",
+"command" : "ls",
+"day" : "*",
+"dayofweek" : "*",
+"hour" : "*",
+"id" : 1,
+"last_run_time" : "0",
+"minute" : "*/1",
+"month" : "*",
+"nick_name" : "yudf",
+"run_all_num" : 0,
+"run_base_time" : "2016-04-21 16:50:00",
+"run_status" : 1,
+"service" : "192.168.60.200",
+"single" : 1,
+"start_time" : "",
+"status" : '1',
+"time_out" : 30,
+"title" : "the three task",
+"update_time" : "2016-04-21 16:49:44"
+})
+
+
+db.time_task.insert({
+	   "run_num" : 1,
+        "task_id" : 1,
+        "start_time" : "2016-04-22 10:38:00",
+        "content" : "1111111111111",
+        "end_time" : "2016-04-22 10:38:00",
+        "run_status" : 4
+})
+
+
+
+
+        "add_time" : "2016-04-22 14:50:00",
+        "category_title" : "other",
+        "command" : "ls",
+        "day" : "*",
+        "dayofweek" : "*",
+        "hour" : "*",
+        "id" : 2,
+        "last_run_time" : "0",
+        "minute" : "*/1",
+        "month" : "*",
+        "nick_name" : "yudf",
+        "run_all_num" : 0,
+        "run_base_time" : "2016-04-21 16:50:00",
+        "run_status" : 1,
+        "service" : "192.168.60.200",
+        "single" : 1,
+        "start_time" : "",
+        "status" : 0,
+        "time_out" : 30,
+        "title" : "the two task",
+        "update_time" : "2016-04-21 16:49:44"
+
+		run_name
+		remark
+		is_remind
+		remind_email
+
+
+db.time_task.update({},{$set:{run_name:'root',remark:'',is_remind:0,remind_email:''}})
+
+
+
+"_id" : ObjectId("57198e881ff9cf18a0f081b9"),
+"run_num" : 1,
+"task_id" : 1,
+"start_time" : "2016-04-22 10:38:00",
+"content" : "",
+"end_time" : "2016-04-22 10:38:00",
+"run_status" : 4
+
+id
+run_time
+run_memory
+add_time
+
+db.time_
+
+
+
+
+用户相关
+
+1、添加一个用户
+
+ db.addUser("name");
+
+ db.addUser("userName", "pwd123", true); 添加用户、设置密码、是否只读
+
+2、数据库认证、安全模式
+
+ db.auth("userName", "123123");
+
+3、显示当前所有用户
+
+ show users;
+
+4、删除用户
+
+ db.removeUser("userName");
+
+
+
+
+ =================================手册============================================
+ 1、基本操作
+db.AddUser(username,password) 添加用户
+db.auth(usrename,password) 设置数据库连接验证
+db.cloneDataBase(fromhost) 从目标服务器克隆一个数据库
+db.commandHelp(name) returns the help for the command
+db.copyDatabase(fromdb,todb,fromhost) 复制数据库fromdb---源数据库名称，todb---目标数据库名称，fromhost---源数据库服务器地址
+db.createCollection(name,{size:3333,capped:333,max:88888}) 创建一个数据集，相当于一个表
+db.currentOp() 取消当前库的当前操作
+db.dropDataBase() 删除当前数据库
+db.eval_r(func,args) run code server-side
+db.getCollection(cname) 取得一个数据集合，同用法：db['cname'] or
+db.getCollenctionNames() 取得所有数据集合的名称列表
+db.getLastError() 返回最后一个错误的提示消息
+db.getLastErrorObj() 返回最后一个错误的对象
+db.getMongo() 取得当前服务器的连接对象get the server
+db.getMondo().setSlaveOk() allow this connection to read from then nonmaster membr of a replica pair
+db.getName() 返回当操作数据库的名称
+db.getPrevError() 返回上一个错误对象
+db.getProfilingLevel()
+db.getReplicationInfo() 获得重复的数据
+db.getSisterDB(name) get the db at the same server as this onew
+db.killOp() 停止（杀死）在当前库的当前操作
+db.printCollectionStats() 返回当前库的数据集状态
+db.printReplicationInfo()
+db.printSlaveReplicationInfo()
+db.printShardingStatus() 返回当前数据库是否为共享数据库
+db.removeUser(username) 删除用户
+db.repairDatabase() 修复当前数据库
+db.resetError()
+db.runCommand(cmdObj) run a database command. if cmdObj is a string, turns it into {cmdObj:1}
+db.setProfilingLevel(level) 0=off,1=slow,2=all
+db.shutdownServer() 关闭当前服务程序
+db.version() 返回当前程序的版本信息
+
+ 
+
+2、数据集(表)操作
+db.test.find({id:10}) 返回test数据集ID=10的数据集
+db.test.find({id:10}).count() 返回test数据集ID=10的数据总数
+db.test.find({id:10}).limit(2) 返回test数据集ID=10的数据集从第二条开始的数据集
+db.test.find({id:10}).skip(8) 返回test数据集ID=10的数据集从0到第八条的数据集
+db.test.find({id:10}).limit(2).skip(8) 返回test数据集ID=1=的数据集从第二条到第八条的数据
+db.test.find({id:10}).sort() 返回test数据集ID=10的排序数据集
+db.test.findOne([query]) 返回符合条件的一条数据
+db.test.getDB() 返回此数据集所属的数据库名称
+db.test.getIndexes() 返回些数据集的索引信息
+db.test.group({key:...,initial:...,reduce:...[,cond:...]})
+db.test.mapReduce(mayFunction,reduceFunction,<optional params>)
+db.test.remove(query) 在数据集中删除一条数据
+db.test.renameCollection(newName) 重命名些数据集名称
+db.test.save(obj) 往数据集中插入一条数据
+db.test.stats() 返回此数据集的状态
+db.test.storageSize() 返回此数据集的存储大小
+db.test.totalIndexSize() 返回此数据集的索引文件大小
+db.test.totalSize() 返回些数据集的总大小
+db.test.update(query,object[,upsert_bool]) 在此数据集中更新一条数据
+db.test.validate() 验证此数据集
+db.test.getShardVersion() 返回数据集共享版本号
+
+
+
+db.term.aggregate([
+     {$match:{library_id:3607}},
+     {$limit:5},
+     {$group:{_id:"$version", count: {$sum:1}}},
+     {$sort:{count:-1}}
+])
+term：你要查询的集合名称
+$match：匹配条件，可选
+$limit：结果条数，可选
+$group：聚合规则
+$sort：对查询结果排序，-1表示降序
+
+db.test.group(
+        {       
+                key: { //分组的依据
+                        'title': true
+                },
+                cond: { //条件
+                        'status': 0
+                },
+                reduce: function(obj, prev) {  表对象：obj，显示的字段对象：prev
+                        prev.num += 1;
+
+                },
+                initial: { // 初始化
+                        num:0
+                }
+        }
+) 
+
+
+db.stor_original_20160511.find({surl:/http:\/\/m\.job1001\.com/}).count()
+
+
+db.test.aggregate([
+  # 由上到下,分阶段的进行,注意该数组中的顺序是有意义的
+  {
+    $project:{title:1,status:1} # 1.取出什么元素待操作;
+  },
+  {
+    $group:{ # 2. 对已取出的元素进行聚合运算;
+      _id:"$title", # 根据什么来分组
+      count:{$sum:1},
+    }
+  },
+  {
+    $sort:{
+      quantityCount:1 #3.升序
+    }
+  },
+
+  # 4.基于上面的结果,取倒数第二名
+  {
+    $skip: 2
+  },
+  {
+    $limit:1
+  },
+
+  # 5.然后把结果写到result集合中
+  {
+    $out:'result'
+  }
+])
+ 
+
+
+
+3、MongoDB语法与现有关系型数据库SQL语法比较
+MongoDB语法 MySql语法
+db.test.find({'name':'foobar'}) <==> select * from test where name='foobar'
+db.test.find() <==> select * from test
+db.test.find({'ID':10}).count() <==> select count(*) from test where ID=10
+db.test.find().skip(10).limit(20) <==> select * from test limit 10,20
+db.test.find({'ID':{$in:[25,35,45]}}) <==> select * from test where ID in (25,35,45)
+db.test.find().sort({'ID':-1}) <==> select * from test order by ID desc
+db.test.distinct('name',{'ID':{$lt:20}}) <==> select distinct(name) from test where ID<20
+
+db.test.group({key:{'name':true},cond:{'name':'foo'},reduce:function(obj,prev){prev.msum+=obj.marks;},initial:{msum:0}}) <==> select name,sum(marks) from test group by name
+
+db.test.find('this.ID<20',{name:1}) <==> select name from test where ID<20
+db.test.insert({'name':'foobar','age':25})<==>insert into test ('name','age') values('foobar',25)
+db.test.remove({}) <==> delete * from test
+db.test.remove({'age':20}) <==> delete test where age=20
+db.test.remove({'age':{$lt:20}}) <==> elete test where age<20
+db.test.remove({'age':{$lte:20}}) <==> delete test where age<=20
+db.test.remove({'age':{$gt:20}}) <==> delete test where age>20
+db.test.remove({'age':{$gte:20}}) <==> delete test where age>=20
+db.test.remove({'age':{$ne:20}}) <==> delete test where age!=20
+db.test.update({'name':'foobar'},{$set:{'age':36}}) <==> update test set age=36 where name='foobar'
+db.test.update({'name':'foobar'},{$inc:{'age':3}}) <==> update test set age=age+3 where
+name='foobar'
+
+ 
+
+4、MongoDB主从复制介绍
+MongoDB的主从复制其实很简单，就是在运行 主的服务器 上开启mongod进程 时，加入参数--master即可，在运行从的服务 器上开启mongod进程时，加入--slave 和 --source 指定主即可，这样，在主数据 库更新时，数据被复制到从数据库 中
+
+(这里日志 文件 和访问 数据时授权用户暂时不考虑 )
+下面我在单台服务器上开启2 deamon来模拟2台服务器进行主从复制：
+$ mkdir m_master m_slave
+$mongodb/bin/mongod  --port  28018 --dbpath ~/m_master  --master  &
+$mongodb/bin/mongod  --port  28019 --dbpath ~/m_slave  --slave  --source   localhost:28018  &
+这样主从服务器都已经启动了，可以利用 netstat -an -t 查看28018、28019端口 是否开放
+
+登录主服务器：
+$ mongodb/bin/mongo --port 28018
+MongoDB shell version: 1.2.4-
+url: test
+connecting to: 127.0.0.1:28018/test
+type "help" for help
+> show dbs
+admin
+local
+test
+> use test
+switched to db test
+> show collections
+这里主上的test数据什么表都没有，为空，查看从服 务器同样也是这样
+$ mongodb/bin/mongo --port 28019
+MongoDB shell version: 1.2.4-
+url: test
+connecting to: 127.0.0.1:28019/test
+type "help" for help
+> show dbs
+admin
+local
+test
+> use test
+switched to db test
+> show collections
+那么现在我们来验证主从数据是否会像想象的那样同步 呢？
+
+
+我们在主上新建表user
+> db  
+test
+>db.createCollection("user");
+> show collections           
+system.indexes
+user
+>
+表 user已经存在了，而且test库中还多了一个system.indexes用来存放索引的表
+
+到从服务器上查看test库：
+> db  
+test
+> show collections           
+system.indexes
+User
+> db.user.find();
+>
+从 服务器的test库中user表已经存在，同时我还查了一下user表为空
+现在我们再来测试一下，向主服务器test库的user表中插入一条数据
+> show collections           
+system.indexes
+user
+> db.user.insert({uid:1,name:"Falcon.C",age:25});
+> db.user.find();                               
+{ "_id" : ObjectId("4b8226a997521a578b7aea38"), "uid" : 1, "name" : "Falcon.C", "age" : 25 }
+>
+这 时我们查看从服务器的test库user表时会多出一条记录来：
+> db.user.find();
+{ "_id" : ObjectId("4b8226a997521a578b7aea38"), "uid" : 1, "name" : "Falcon.C", "age" : 25 }
+>
+MongoDB 还有 Replica Pairs 和 Master - Master
+参考地址：http://www.mongodb.org/display/DOCS/Master+Slave
+
+
+MongoDB一般情况下都可以支持主主复制，但是在大部分情况下官方不推荐使用
+运行 的master - master的准备工作是：
+新建存放数据 库文件 的路径
+$mkdir mongodata/mm_28050 mongodata/mm_28051
+运行mongodb数据库 ，一个端口 为：28050，一个为：28051
+$ mongodb/bin/mongod --port 28050 --dbpath ~/mongodata/mm_28050 --master --slave --source localhost:28051 > /dev/null &
+$ mongodb/bin/mongod --port 28051 --dbpath ~mongodata/mm_28051 --master --slave --source localhost:28050 > /dev/null &
+可以通过ps -ef|grep mongod 或 netstat -an -t来检查是否运行功能
+
+
+测试master - master模式 ：
+$ mongodb/bin/mongo --port 28050
+MongoDB shell version: 1.2.4-
+url: test
+connecting to: 127.0.0.1:28050/test
+type "help" for help
+> show dbs
+admin
+local
+> db
+test
+> db.user.insert({_id:1,username:"Falcon.C",age:25,sex:"M"});
+> db.user.find();
+{ "_id" : 1, "username" : "Falcon.C", "age" : 25, "sex" : "M" }
+> db.user.find();  //在28051端口插入数据后，再来查询，看数据是否同步
+{ "_id" : 1, "username" : "Falcon.C", "age" : 25, "sex" : "M" }
+{ "_id" : 2, "username" : "NetOne", "age" : 24, "sex" : "F" }
+>
+$ mongodb/bin/mongo --port 28051
+MongoDB shell version: 1.2.4-
+url: test
+connecting to: 127.0.0.1:28051/test
+type "help" for help
+> db
+test
+> show collections         端口28050已经新建了一个user表并插入了一条数据，这里多出2表
+system.indexes
+user
+> db.user.find();        //查询表user发现数据已经同步
+{ "_id" : 1, "username" : "Falcon.C", "age" : 25, "sex" : "M" }
+> db.user.insert({_id:2,username:"NetOne",age:24,sex:"F"});在此插入数据看数据是否双向同步
+> db.user.find();  
+{ "_id" : 1, "username" : "Falcon.C", "age" : 25, "sex" : "M" }
+{ "_id" : 2, "username" : "NetOne", "age" : 24, "sex" : "F" }
+>
+通 过以上开启两终端分别连接到28050、28051端口，分别插入测试数据发现，一切正常，正如我们所想的那样实现数据的双向同步
+
+//扩展代码
+Date.prototype.format = function(format)
+{
+    var o =
+    {
+        "M+" : this.getMonth()+1, 
+        "d+" : this.getDate(),    
+        "h+" : this.getHours(),   
+        "m+" : this.getMinutes(), 
+        "s+" : this.getSeconds(), 
+        "q+" : Math.floor((this.getMonth()+3)/3),  
+        "S" : this.getMilliseconds() 
+    }
+    if(/(y+)/.test(format))
+    format=format.replace(RegExp.$1,(this.getFullYear()+"").substr(4 - RegExp.$1.length));
+    for(var k in o)
+    if(new RegExp("("+ k +")").test(format))
+    format = format.replace(RegExp.$1,RegExp.$1.length==1 ? o[k] : ("00"+ o[k]).substr((""+ o[k]).length));
+    return format;
+}
+var myDate = new Date();
+/* var datetime = myDate.format("yyyy-MM-dd hh:mm:ss"); */
+
+
+/*日期转时间错*/
+/*getTime('2016-04-26 00:00:00')*/
+function getTime(day,type){       
+    re = /(\d{4})(?:-(\d{1,2})(?:-(\d{1,2}))?)?(?:\s+(\d{1,2}):(\d{1,2}):(\d{1,2}))?/.exec(day); 
+    var time = new Date(re[1],(re[2]||1)-1,re[3]||1,re[4]||0,re[5]||0,re[6]||0).getTime();
+    if(type==undefined){
+        return Math.floor(time/1000);
+    }else if(type=='ms'){
+        return time;
+    }
+}
+
+/*2维转1维*/
+function jsonToArr(json,num){
+    if(typeof(num)=="undefined"){
+        num = 'num'
+    }
+    var out = [];
+    for (var i = 0; i < json.length; i++) {
+        out[a[i]['_id']] = a[i][num];
+    };
+    return out;
+}
+
+/*调试输出dump*/
+function dump(param){
+    if(typeof(param)=="object"){
+        for (var i in param)
+        {
+            print(i+" : "+param[i]);
+        }
+    }
+    print(param);
+}
+
+/*数组包含*/
+function in_array(val,arr) {
+    var i = arr.length;
+    while (i--) {
+        if (arr[i] === val) {
+            return true;
+        }
+    }
+    return false;
+}
