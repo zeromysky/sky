@@ -1,0 +1,95 @@
+##-----------邮箱有效性检测--------##
+
+1. MX记录，winodws的nslookup命令。
+dns服务器的信息，
+查询dns服务器只是正常的网络通信。
+
+2. SMTP协议，如何通过telnet发送邮件。
+
+##-------------相关步骤------------##
+
+#安装 dnspython  检测dns
+http://blog.chinaunix.net/uid-28841896-id-4652377.html
+
+wget http://www.dnspython.org/kits/1.14.0/dnspython-1.14.0.tar.gz
+tar -zxf dnspython-1.14.0.tar.gz
+cd dnspython-1.14.0
+python setup.py install
+
+
+
+#安装  pymongo
+http://www.oschina.net/question/54100_27084
+https://pypi.python.org/pypi/pymongo/3.3.0#downloads
+
+wget https://pypi.python.org/packages/31/63/5a7826bdee88db6d49ef1737a17de63cf6f50f8cb04f2a0339f048cb33b5/pymongo-3.3.0.tar.gz#md5=42cd12a5014fb7d3e1987ca04f5c651f
+
+tar zxvf pymongo-3.3.0.tar.gz
+cd pymongo-3.3.0
+python setup.py install
+
+
+#安装 PySocks
+https://github.com/Anorov/PySocks
+
+##----------专业名称说明------------##
+
+DNS　检测
+
+A记录，将域名名转换成IP地址
+MX记录，邮件交换记录，定义邮件服务器的域名
+CNAME记录，别名记录，实现域名间的映射
+NS记录，标记区域的域名服务器及授权子域
+PTR记录，反向解析，与A记录相反
+SOA记录，一个起始授权区的定义
+
+
+SMTP (Simple Mail Transfer Protocol) : 电子邮件从客户机传输到服务器或从某一个服务器传输到另一个服务器使用的传输协议。 SMTP 是请求/响应协议，命令和响应都是基于 ASCII 文本，并以 CR 和 LF 符结束。响应包括一个表示返回状态的三位数字代码。
+SMTP 在 TCP 协议 25 端口监听连接请求。
+
+ESMTP (Extended SMTP)，顾名思义，扩展 SMTP 就是对标准 SMTP 协议进行的扩展。它与 SMTP 服务的区别仅仅是，使用 SMTP 发信不需要验证用户帐户，而用 ESMTP 发信时，服务器会要求用户提供用户名和密码以便验证身份。验证之后的邮件发送过程与 SMTP 方式没有两样。
+
+SMTP 命令
+SMTP 命令包括：
+HELO 向服务器标识用户身份。发送者能欺骗，说谎，但一般情况下服务器都能检测到。 
+EHLO 向服务器标识用户身份。发送者能欺骗，说谎，但一般情况下服务器都能检测到。
+MAIL FROM 命令中指定的地址是发件人地址
+RCPT TO 标识单个的邮件接收人；可有多个 RCPT TO；常在 MAIL 命令后面。
+DATA 在单个或多个 RCPT 命令后，表示所有的邮件接收人已标识，并初始化数据传输，以 CRLF.CRLF 结束 
+VRFY 用于验证指定的用户/邮箱是否存在；由于安全方面的原因，服务器常禁止此命令 
+EXPN 验证给定的邮箱列表是否存在，扩充邮箱列表，也常被禁用 
+HELP 查询服务器支持什么命令 
+NOOP 无操作，服务器应响应 OK 
+RSET 重置会话，当前传输被取消
+QUIT 结束会话
+
+
+################
+
+部署
+192.168.60.26_caiji_代理 192.168.60.26 General UNIX  
+/usr/local/python/email
+s.py 核心服务
+s.sh 运行检测
+
+###############
+
+# -*- coding: utf-8 -*-
+import dns.resolver
+import smtplib
+#mx
+domain=raw_input("Please input an domain:")
+MX = dns.resolver.query(domain,'MX')
+# mx_dict = []
+for i in MX:
+	print 'MX preference =',i.preference,'mail exchanger =',i.exchange
+	# mx_dict.append(str(i.exchange))
+
+# print mx_dict
+
+smtp = smtplib.SMTP()  
+smtp.connect("mx3.qq.com:25")  
+print smtp.docmd('helo', 'qq')  
+print smtp.docmd('mail from:', '<from@yeah.net>')  
+print smtp.docmd('rcpt to:', '<2770503648@qq.com>')  
+smtp.quit()  
