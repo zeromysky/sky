@@ -1,0 +1,395 @@
+邮箱有效验证
+
+
+#安装 dnspython  检测dns
+http://blog.chinaunix.net/uid-28841896-id-4652377.html
+
+wget http://www.dnspython.org/kits/1.14.0/dnspython-1.14.0.tar.gz
+tar -zxf dnspython-1.14.0.tar.gz
+cd dnspython-1.14.0
+python setup.py install
+
+
+
+
+打开 9876 端口
+
+s.py : 主要程序
+
+s.sh : 运行监测{
+
+请修改存放的目录
+cd /usr/local/python/email
+
+}
+
+
+运行
+chmod +x s.sh
+
+./s.sh
+
+开机运行 每分钟监测一次
+
+
+
+
+
+#!/usr/bin/python
+#-*-coding:utf-8-*-
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
+import SocketServer
+from BaseHTTPServer import *
+import random,time,os,json,re,datetime
+import dns.resolver
+import smtplib
+import logging
+
+#邮箱验证
+def emailVerify(email):
+
+    if len(email) > 7:
+        if re.match("^[\w\-\.]+@[\w\-\.]+[\.\w+]+$", email) != None:
+            return 1
+    return 0
+
+#时间戳转日期
+def timeToStr(time_stamp=None,format='%Y-%m-%d %H:%M:%S'):
+    if time_stamp==None:
+        return time.strftime(format,time.localtime(time.time()))
+    else:
+        return time.strftime(format,time.localtime(time_stamp))
+
+#日期转时间戳
+def strToTime(time_str,format='%Y-%m-%d %H:%M:%S'):
+    if time_str==None: return;
+    time.strptime(time_str, format)
+    s = time.mktime(time.strptime(time_str, format))
+    return int(s)
+
+#日志
+class Logout():
+    """日志"""
+    logger = None
+    dir_name = 'log/'
+    file_name = ''
+    log_type = 'main'
+    def __init__(self,file_name=None,log_type=None):
+        if log_type != None : self.log_type = log_type
+        self.init(file_name)
+        self.log()
+
+    def init(self,file_name):
+        if not os.path.exists(self.dir_name):
+            os.mkdir(self.dir_name)
+
+        if file_name == None:
+            self.file_name = str(timeToStr(time_stamp=None,format='%Y-%m-%d'))
+        else:
+            self.file_name = file_name
+        pass
+
+    def log(self):
+        self.logger = logging.getLogger(self.log_type)
+        self.logger.setLevel(logging.DEBUG)
+
+        # 创建一个handler，用于写入日志文件
+        file_path = self.dir_name+self.file_name+".txt"
+        fh = logging.FileHandler(file_path)
+        fh.setLevel(logging.DEBUG)
+
+        # 定义handler的输出格式
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        fh.setFormatter(formatter)
+
+        # 给logger添加handler
+        self.logger.addHandler(fh)
+        pass
+
+    def info(self,msg):
+        nowDay = str(timeToStr(time_stamp=None,format='%Y-%m-%d'))
+        if nowDay != self.file_name :
+            self.init(nowDay)
+            self.log()
+        self.logger.info(msg)
+        print msg
+        pass
+
+    #邮箱存在
+    def success(self,msg):
+        f = open ('log/success.txt','a')
+        f.write(msg+'\n')
+        f.close()
+
+    #邮箱不存在
+    def fail(self,msg):
+        f = open ('log/fail.txt','a')
+        f.write(msg+'\n')
+        f.close()
+        pass
+
+
+
+#断点日志
+logger = Logout()
+#logger.info('foorbar')
+
+#有效性检测
+class CheckEmail():
+    #当天日期
+    day = None
+    #MX
+    mx_dict = {}
+    #不存在的mx
+    not_mx = {'day':'','mx':['qq.com']}
+    #SMTP 连接
+    SMTP = {'host':{'time':0,'smtp':None}}
+    #存在
+    in_email = []
+
+    @staticmethod
+    def getMx(email):
+        global logger
+
+        email = email.strip()
+        if email.find('@')<0 or email=='' or email==None or email=='null' or emailVerify(email)==0:
+            logger.info('邮箱格式有误')
+            return {'status':'0','msg':'邮箱格式有误'}
+
+        email_path = email.split('@')
+        domain = str(email_path[len(email_path)-1])
+
+        day = timeToStr(time_stamp=None,format='%Y-%m-%d')
+        if CheckEmail.day == None : CheckEmail.day = day
+
+        logger.info('验证的域名: '+domain)
+
+        #检查不存在
+        if CheckEmail.not_mx['day'] != day: CheckEmail.not_mx['mx'] = []
+        print CheckEmail.not_mx['mx']
+        if domain in CheckEmail.not_mx['mx'] :
+            logger.info('邮箱主机不存在或无法解析')
+            return {'status':'0','msg':'邮箱主机不存在或无法解析'}
+
+        logger.info('MX: '+json.dumps(CheckEmail.mx_dict))
+        if ( domain not in CheckEmail.mx_dict ) or len(CheckEmail.mx_dict[domain])==0:
+            CheckEmail.mx_dict[domain] = {}
+            try:
+
+                #统计时间
+                start_time = time.time()
+                MX = dns.resolver.query(domain,'MX')
+                end_time = time.time()
+                x_time = end_time-start_time
+                logger.info('解析MX时间: '+str(x_time)+'秒')
+
+                # MX = [{'exchange':'mx1.qq.com.'},{'exchange':'mx2.qq.com.'}]
+                domain_list = {'day':CheckEmail.day}
+                mx = []
+                for i in MX:
+                    # print 'MX preference =',i.preference,'mail exchanger =',i.exchange
+                    mx.append(str(i.exchange)[:-1])
+                domain_list.update({'mx':mx})
+
+                CheckEmail.mx_dict[domain] = domain_list
+
+            except Exception, e:
+                logger.info('解析MX异常: '+e.message)
+                logger.info('邮箱主机不存在或无法解析')
+                CheckEmail.not_mx['mx'].append(domain)
+                return {'status':'0','msg':'邮箱主机不存在或无法解析'}
+            else:
+                pass
+            finally:
+                pass
+
+        return CheckEmail.mx_dict[domain]
+
+    @staticmethod
+    def do(email):
+        global logger
+        logger.info('验证的邮箱: '+email)
+
+        if email in CheckEmail.in_email :
+            logger.info('该邮箱已验证过存在！')
+            return {'status':'1'}
+
+
+        logger.info('MX开始解析')
+        mxRes = CheckEmail.getMx(email)
+        logger.info('MX解析结束')
+        if 'status' in  mxRes or len(mxRes)==0:
+            logger.info('MX无法解析,邮箱有误！')
+            mxRes['status'] = '0'
+            mxRes['msg'] = 'MX无法解析,邮箱有误！'
+            return mxRes
+
+        _email = email.lower()
+
+        if _email.find('@163')<0 and _email.find('@126')<0 and _email.find('@yeah')<0 and _email.find('@qq')<0 and _email.find('@foxmail')<0 and _email.find('@vip.qq')<0 and _email.find('@vip.foxmail')<0 and _email.find('@vip.163')<0 and _email.find('@vip.126')<0 and _email.find('@139')<0 :
+            logger.info('不在SMTP验证范围内直接返回成功！')
+            return {'status':'1'}
+
+        ##########163,qq,sohu##########
+
+        nowTime = int(time.time())
+        #mx列表
+        mx_list = mxRes['mx']
+
+        out = {'status':'0'}
+
+        #统计时间
+        start_time = time.time()
+        for host in mx_list:
+            host = host.lower()
+            logger.info('host: '+host)
+            try:
+                if host in CheckEmail.SMTP:
+                    if nowTime-CheckEmail.SMTP[host]['time']>5:
+                        smtp = smtplib.SMTP(host=host,port=25,timeout=3)
+                        CheckEmail.SMTP[host] = {'smtp':smtp,'time':nowTime}
+                        smtp.docmd('helo', host)
+                    else:
+                        smtp = CheckEmail.SMTP[host]['smtp']
+                else:
+                    smtp = smtplib.SMTP(host=host,port=25,timeout=3)
+                    CheckEmail.SMTP[host] = {'smtp':smtp,'time':nowTime}
+                    smtp.docmd('helo', host)
+
+            except Exception, e:
+                logger.info('SMPT 异常,HOST为: '+host)
+                logger.info('SMPT 异常,ERROR为: '+e.message)
+                continue
+
+            #回复人随即数
+            mail_from = str(nowTime)+"@163.com"
+
+            #163
+            if email.find('@163')>=0 or email.find('@126')>=0 or email.find('@yeah')>=0 or email.find('@vip.163')>=0 or email.find('@vip.126')>=0 or email.find('@139')>=0:
+                mail_from = str(nowTime)+"@qq.com"
+
+            logger.info("MAIL FROM "+mail_from)
+            logger.info("RCPT TO "+email)
+            try:
+                smtp.docmd('mail from:', '<'+mail_from+'>')
+                res = smtp.docmd('rcpt to:', '<'+email+'>')
+            except Exception, e:
+                logger.info("SMTP 异常: "+e.message)
+                out['status'] = '1'
+                break
+            else:
+                pass
+            finally:
+                pass
+
+            if res[0] == '250':
+                out['status'] = '1'
+            else:
+                out = {'status':'0','msg':str(res[0])+" : "+str(res[1])}
+            break
+
+        end_time = time.time()
+        x_time = end_time - start_time
+        logger.info("SMTP验证的时间: "+str(x_time)+'秒')
+
+        return out
+
+
+class HttpHanderX(BaseHTTPRequestHandler):
+
+    def __init__(self,request, client_address, server):
+        BaseHTTPRequestHandler.__init__(self,request, client_address, server)
+
+    def send(self,msg):
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+        self.wfile.write(msg)
+        self.wfile.close()
+
+
+    def deal_email(self):
+        global logger
+
+        start_time = time.time()
+
+        logger.info("接收数据开始")
+        size = 0
+        try:
+            if 'content-length' in self.headers :
+                size = int(self.headers['content-length'])
+        except Exception, e:
+            logger.info("接收数据异常"+e.message)
+            msg = {'status':'0','msg':'参数错误'}
+            self.send(json.dumps(msg))
+            return
+
+        data = self.rfile.read(size)
+        logger.info("数据: "+data)
+        logger.info("接收数据结束")
+
+        end_time = time.time()
+        x_time = end_time-start_time
+        logger.info('接收数据时间: '+str(x_time)+'秒')
+
+        data = json.loads(data)
+        email = data['email']
+
+        res = CheckEmail.do(email)
+        logger.info("邮箱验证结果: "+json.dumps(res))
+        self.send(json.dumps(res))
+
+        nowTime = str(timeToStr())
+        #添加存在的
+        if res['status']=='1':
+            logger.success(nowTime+" ["+email+"]")
+            if len(CheckEmail.in_email)>10000 :
+                CheckEmail.in_email.pop(0)
+                CheckEmail.in_email.append(email)
+            else:
+                CheckEmail.in_email.append(email)
+        else:
+            logger.fail(nowTime+" ["+email+"]")
+
+        pass
+
+    def do_GET(self):
+        print '-------get--------'
+        print self.path
+        print '-------end--------'
+
+    def do_POST(self):
+        logger.info('-------post--------')
+        logger.info(self.client_address)
+        logger.info(self.request_version)
+        if self.path=="/email":
+            start_time = time.time()
+            self.deal_email()
+            end_time = time.time()
+            x_time = end_time-start_time
+            logger.info("一共运行的时间: "+str(x_time)+'秒')
+        logger.info('--------end--------')
+        pass
+
+
+
+PORT = 9876
+httpd = SocketServer.TCPServer(("", PORT), HttpHanderX)
+print "serving at port", PORT
+httpd.serve_forever()
+
+
+
+
+cd /usr/local/python/email
+PID=`ps -ef | grep 's.py' | grep -v grep | awk '{print $2}'`
+
+if [ ! -z "$PID" ]; then
+ echo NO
+else
+ echo YES
+ nohup python s.py  >/dev/null 2>>_err.log &
+fi
