@@ -1,0 +1,31 @@
+#mongoDB 相关
+class DBM():
+
+    host = '192.168.3.72'
+    port = 10002
+    conn = None
+    db = None
+    db_name = ''
+    table_name = ''
+
+    def __init__(self,host=None,port=None):
+        if host != None : self.host = host
+        if port != None : self.port = port
+        self.conn = pymongo.Connection(self.host, self.port)
+
+    #设置数据库
+    def setDb(self,db_name):
+        self.db_name = db_name
+        self.db = self.conn[db_name]
+        return self
+        
+    #设置表
+    def setTable(self,table_name):
+        self.table_name = table_name
+        return self
+        
+
+    #查询多条
+    def find(self,where,field=None):
+        if field == None : return self.db[self.table_name].find(where)
+        return self.db[self.table_name].find(where,field)
