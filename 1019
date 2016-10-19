@@ -1,0 +1,245 @@
+
+
+hadoop dfs -mkdir /data1/datab...
+	
+hadoop dfs -mkdir /data1/databases/test
+
+hadoop dfs -put test.txt  /data1/databases/test
+
+CREATE EXTERNAL TABLE test(
+follow_id int COMMENT '自动编号',
+
+) COMMENT '用户关注表'
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\t'
+LINES TERMINATED BY '\n'
+STORED AS TEXTFILE
+LOCATION '/data1/databases/test';
+
+
+
+hadoop dfs -mkdir /data1/databases/test2
+
+hadoop dfs -put test2.txt  /data1/databases/test2
+
+
+CREATE EXTERNAL TABLE test2(
+id int COMMENT '自动编号',
+
+) COMMENT '用户关注表'
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\t'
+LINES TERMINATED BY '\n'
+STORED AS TEXTFILE
+LOCATION '/data1/databases/test2';
+
+
+
+
+#--------常用命令--------------#
+
+#查看目录
+hadoop dfs -ls /
+
+#创建目录
+hadoop dfs -mkdir /home
+
+#创建一个空文件
+hadoop dfs -touchz /361way
+
+#删除一个文件
+hadoop dfs -rm /361way
+
+#删除一个目录
+hadoop dfs -rmr /home
+
+#重命名
+hadoop dfs -mv /hello1 /hello2
+
+#查看文件
+hadoop dfs -cat /hello
+
+#将制定目录下的所有内容merge成一个文件，下载到本地
+hadoop dfs -getmerge /hellodir wa
+
+
+#使用du文件和目录大小
+hadoop dfs -du /
+
+#将目录拷贝到本地
+hadoop dfs -copyToLocal  /home localdir
+
+#查看dfs的情况
+hadoop dfsadmin -report
+
+
+#上传文件或目录到hdfs
+hadoop dfs -put hello /
+hadoop dfs -put hellodir/ /
+
+
+
+#-------------显示命令---------------------#
+
+
+•show tables;
+•show databases;
+•show partitions; 查看分区
+•show functions;
+•describe extended table_name dot col_name
+
+
+
+#-------------数据库------------------#
+
+#创建库
+hive>create  database  if  not  exists  financials ;
+
+#查询数据
+hive>show  databases  like  " f . * " ;
+
+#删除数据库：
+hive> drop database if exists human_resources;
+
+#使用数据库
+hive> use my_db;
+
+#--------------表--------------------#
+
+http://www.cnblogs.com/1130136248wlxk/articles/5515365.html
+http://www.cnblogs.com/1130136248wlxk/articles/5516343.html
+字段类型
+http://blog.csdn.net/wind520/article/details/39210067
+
+字段类型
+
+a.基本数据类型
+TINYINT: 1个字节
+SMALLINT: 2个字节
+INT: 4个字节   
+BIGINT: 8个字节
+BOOLEAN: TRUE/FALSE  
+FLOAT: 4个字节，单精度浮点型
+DOUBLE: 8个字节，双精度浮点型STRING       字符串
+
+b.复杂数据类型
+ARRAY: 有序字段
+MAP: 无序字段
+STRUCT: 一组命名的字段
+
+4.表类型
+hive表大致分为普通表、外部表、分区表三种。
+
+
+CREATE TABLE test_db.pokes (foo INT, bar STRING COMMENT 'This is bar'); 
+
+
+#表详情
+hive> desc my_table;
+hive> desc extended my_tables;
+
+#创建表#
+
+CREATE EXTERNAL TABLE my_table (
+
+id INT,
+
+ip STRING COMMENT '访问者IP',
+
+avg_view_depth DECIMAL(5,1),
+
+bounce_rate DECIMAL(6,5)
+
+) COMMENT '表注释'
+
+PARTITIONED BY (day STRING)  
+
+ROW FORMAT DELIMITED
+
+FIELDS TERMINATED BY ','
+
+STORED AS textfile
+
+LOCATION 'hdfs://cdh5/tmp/lxw1234/';
+
+----
+	【EXTERNAL】表示该表为外部表，如果不指定EXTERNAL关键字，则表示内部表
+
+	【COMMENT】为表和列添加注释
+
+	【PARTITIONED BY】表示该表为分区表，分区字段为day,类型为string
+
+	【ROW FORMAT DELIMITED】指定表的分隔符，通常后面要与以下关键字连用：
+
+	FIELDS TERMINATED BY ',' //指定每行中字段分隔符为逗号
+
+	LINES TERMINATED BY '\n' //指定行分隔符
+
+	COLLECTION ITEMS TERMINATED BY ',' //指定集合中元素之间的分隔符
+
+	MAP KEYS TERMINATED BY ':' //指定数据中Map类型的Key与Value之间的分隔符
+
+	举个例子：
+
+	create table score(name string, score map<string,int>)
+
+	ROW FORMAT DELIMITED
+
+	FIELDS TERMINATED BY '\t'
+
+	COLLECTION ITEMS TERMINATED BY ','
+
+	MAP KEYS TERMINATED BY ':';
+
+	要加载的文本数据为：
+
+	biansutao '数学':80,'语文':89,'英语':95
+
+	jobs '语文':60,'数学':80,'英语':99
+
+	【STORED AS】指定表在HDFS上的文件存储格式，可选的文件存储格式有：
+
+	TEXTFILE //文本，默认值
+
+	SEQUENCEFILE // 二进制序列文件
+
+	RCFILE //列式存储格式文件 Hive0.6以后开始支持
+
+	ORC //列式存储格式文件，比RCFILE有更高的压缩比和读写效率，Hive0.11以后开始支持
+
+	PARQUET //列出存储格式文件，Hive0.13以后开始支持
+
+	【LOCATION】指定表在HDFS上的存储位置。
+----
+
+#----导入数据-----#
+
+创建表
+hive> create table tb_person(id int, name string);
+
+创建表并创建分区字段ds
+hive> create table tb_stu2(id int, name string) partitioned by(ds string) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' ;
+
+/root/1.txt
+1,zhangsan
+2,lisi
+3,wangwu
+
+#将文件中的数据加载到表中
+hive> load data local inpath '/root/1.txt' overwrite into table tb_person;
+
+#加载本地数据，同时给定分区信息
+hive> load data local inpath '/root/1.txt' overwrite into table tb_stu partition (ds='2008-08-15');
+
+
+【外部表】
+external关键字可以让用户创建一个外部 表，在建表的同时指定一个指向实际数据的路径(location)，hive创建内部表时，会将数据移动到数据仓库指向的路径；若创建外部表，仅记录数据 所在的路径，不对数据的位置做任何改变。在删除表的时候，内部表的元数据和数据会被一起删除，而外部表只删除元数据，不删除数据。
+eg. 创建外部表：
+
+create external table tb_record(col1 string, col2 string) row format delimited fields terminated by '\t' location '/user/hadoop/input'
+
+
+【查询】
+
+http://www.cnblogs.com/1130136248wlxk/articles/5515426.html
+http://www.cnblogs.com/HondaHsu/p/4346354.html
