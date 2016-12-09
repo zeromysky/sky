@@ -1,0 +1,331 @@
+# #数据文件
+dbpath = F: /bin/mongodb / db
+
+# #日志文件
+logpath = F: /bin/mongodb / log / mongo.log
+
+
+mongod.exe--bind_ip yourIPadress--logpath "C:\data\dbConf\mongodb.log"--logappend--dbpath "C:\data\db"--port yourPortNumber--serviceName "YourServiceName"--serviceDisplayName "YourServiceName"--install
+
+--bind_ip绑定服务 IP，若绑定 127.0.0.1，则只能本机访问，不指定默认本地所有 IP
+--logpath定 MongoDB日志文件，注意是指定文件不是目录
+--logappend使用追加的方式写日志
+--dbpath指定数据库路径
+--port指定服务端口号，默认端口 27017
+--serviceName指定服务名称
+--serviceDisplayName指定服务名称，有多个 mongodb服务时执行。
+--install指定作为一个 Windows服务安装。
+
+# MongoDB的服务
+D: \mongodb\ bin\ mongod.exe--dbpath "F:/bin/mongodb/db"--logpath "F:/bin/mongodb/log/mongo.log"
+
+#开启客户端
+D: \mongodb\ bin\ mongo.exe
+
+分片
+
+在 Mongodb里面存在另一种集群，就是分片技术,
+可以满足MongoDB数据量大量增长的需求。当 MongoDB存储海量的数据时，一台机器可能不足以存储数据，也可能不足以提供可接受的读写吞吐量。这时，我们就可以通过在多台机器上分割数据，使得数据库系统能存储和处理更多的数据。
+
+
+Shard: 用于存储实际的数据块，实际生产环境中一个shard server角色可由几台机器组个一个 relica set承担，防止主机单点故障
+
+Config Server: mongod实例，存储了整个 ClusterMetadata，其中包括 chunk信息。
+
+Query Routers: 前端路由，客户端由此接入，且让整个集群看上去像单一数据库，前端应用可以透明使用。
+
+
+副本集（Replica Set）是指同一份数据被保存到N个机器上，每个机器上都是想同的数据。
+分片（shard）是指一份数据被分离开保存到N个机器上，N个机器上的数据组合起来是一份数据。
+
+集群分片
+http://www.cnblogs.com/chaoa/p/3914155.html
+http://blog.chinaunix.net/uid-26284318-id-3073139.html
+副本集
+http://www.cnblogs.com/zhoujinyi/p/3554010.html
+#集群
+http://blog.csdn.net/luonanqin/article/details/8497860
+
+Shard Server 1： 10000 副本集 setA
+Shard Server 2： 10001 副本集 setA
+Shard Server 3： 10002 副本集 setA
+
+
+Config Server： 20000
+Route Process： 40000
+
+文件夹区分
+shard / s0
+shard / s1
+shard / s2
+shard / s3
+shard / log
+
+
+创建分片和复本集
+
+Shard Server
+D:\mongodb\bin\mongod.exe --port 10000 --dbpath "F:/bin/mongodb/shard/s0" --replSet setA --logpath "F:/bin/mongodb/log/s0.log" --profile=1 --slowms=5  --shardsvr
+
+D:\mongodb\bin\mongod.exe --port 10001 --dbpath "F:/bin/mongodb/shard/s1" --logpath "F:/bin/mongodb/log/s1.log" --replSet setA --profile=1 --slowms=5  --shardsvr
+
+
+D:\mongodb\bin\mongod.exe --port 10002 --dbpath "F:/bin/mongodb/shard/s2" --logpath "F:/bin/mongodb/log/s2.log" --replSet setA --profile=1 --slowms=5  --shardsvr
+
+D:\mongodb\bin\mongod.exe --port 10003 --dbpath "F:/bin/mongodb/shard/s3" --replSet setA --logpath "F:/bin/mongodb/log/s0.log" --profile=1 --slowms=5  --shardsvr
+
+启动上述分片节点之后，再使用mongo的命令行来初始化复制集
+
+
+D:\mongodb\bin\mongo.exe admin --port 10000
+
+config={_id: 'setA', members:[{_id: 0,host:'127.0.0.1:10000'},{_id:1,host:'127.0.0.1:10001'},{_id:2,host:'127.0.0.1:10002'}]}
+
+rs.initiate(config);
+
+重新登录 出现 primary
+
+Config Server
+D:\mongodb\bin\mongod.exe  --port 20000 --dbpath "F:/bin/mongodb/shard/config" --logpath "F:/bin/mongodb/log/config.log" --configsvr
+
+
+Route Process
+D:\mongodb\bin\mongos.exe --port 40000 --configdb 127.0.0.1:20000 --logpath "F:/bin/mongodb/log/route.log" --chunkSize 500
+
+#客户端
+D:\mongodb\bin\mongo.exe admin --port 40000
+
+
+#添加Shard节点
+db.runCommand({addshard:"setA/127.0.0.1:10000,127.0.0.1:10001,127.0.0.1:10002",name:"ShardSetA"})
+
+#启动分片
+db.runCommand({"enablesharding":"test"})
+db.runCommand({"shardcollection":"test.person","key":{"_id":"hashed"}})
+
+#添加表
+for (i = 0; i < 2000; i++) {
+	db.person.insert({
+			"i": i,
+			"name": "user" + i,
+			"age": Math.floor(Math.random() * 120),
+			"created": new Date()
+	});
+}
+
+
+db.printShardingStatus()
+这里主要看三点信息：
+
+shards：我们清楚的看到已经别分为两个片了，shard0000和shard0001。
+
+databases：这里有个partitioned字段表示是否分区，这里清楚的看到test已经分区。
+
+chunks：这个很有意思，我们发现集合被砍成四段：无穷小 —— jack0，jack0 ——jack234813，jack234813——jack9999，jack9999——无穷大。分区情况为：3：1，从后面的 on shardXXXX也能看得出。
+
+http://blog.csdn.net/leftfist/article/details/39583585
+副本集中设置读写
+db.getMongo().setSlaveOk();
+
+
+mongodb 文档
+http://docs.mongoing.com/manual-zh/tutorial/replace-replica-set-member.html
+
+##########副本集#########
+==================================================================================
+http://www.cnblogs.com/zhoujinyi/p/3554010.html
+
+主节点 
+	负责所有的数据库写操作，默认情况下，主节点也负责处理所有的数据库读操作；
+副本节点
+ 	负责同步主节点的数据操作日志更新本地数据库，从而保证副本节点的数据和主节点上的数据的一致性；副本节点的从某种意义上来讲有点像赛跑，永远在追赶主节点的数据操作；
+仲裁者节点
+	不负责保存具体的数据，只是在副本集进行主节点选举时提供自己的一个选票而已。
+
+Secondary-Only：
+	和副本节点一样保存了主节点的数据副本，但是在任何情况下都成为不了Primary主节点；
+
+Hidden：
+	这种类型的节点对于客户端程序是不可见的，同样不能成为Primary主节点，但是可以参与投票；
+
+Delayed：
+	这种类型的节点可以通过人为的设置，可以指定一个时间来延迟从主节点同步数据，Delayed成员主要用于从一些误操作中恢复旧数据，并且肯定不能成为主节点而且是Hidden的；
+
+从副本节点上读取数据，从而达到读写分离
+
+这时候我们就需要了解ReadPreference了，下面简单列下都有哪些模式可以供我们选择：
+
+（1）primary：默认方式，所有的读操作都从主节点获取；
+
+（2）primaryPerferred：在大多数场景下直接从主节点进行读操作，如果主节点读操作不可用时，则从副本节点进行读取；
+
+（3）secondary：所有的读操作都只从副本节点进行读取；
+
+（4）secondaryPreferred：在大多数场景下，读操作都从副本节点进行读操作，如果副本节点不可用，那么考虑从主节点进行读取；
+
+（5）nearest：所有的读操作从网络延迟最小的节点上进行读操作；
+
+1. STARTUP：刚加入到复制集中，配置还未加载  
+2. STARTUP2：配置已加载完，初始化状态  
+3. RECOVERING：正在恢复，不适用读  
+4. ARBITER: 仲裁者  
+5. DOWN：节点不可到达  
+6. UNKNOWN：未获取其他节点状态而不知是什么状态，一般发生在只有两个成员的架构，脑裂  
+7. REMOVED：移除复制集  
+8. ROLLBACK：数据回滚，在回滚结束时，转移到RECOVERING或SECONDARY状态  
+9. FATAL：出错。查看日志grep “replSet FATAL”找出错原因，重新做同步  
+10. PRIMARY：主节点  
+11. SECONDARY：备份节点 
+
+
+D:\mongodb\bin\mongod.exe --port 10000 --dbpath "F:/bin/mongodb/shard/fu1" --replSet setA --logpath "F:/bin/mongodb/log/fu1.log" --profile=1 --slowms=5  --shardsvr
+
+D:\mongodb\bin\mongod.exe --port 10001 --dbpath "F:/bin/mongodb/shard/fu2" --logpath "F:/bin/mongodb/log/fu2.log" --replSet setA --profile=1 --slowms=5  --shardsvr
+
+D:\mongodb\bin\mongod.exe --port 10002 --dbpath "F:/bin/mongodb/shard/fu3" --logpath "F:/bin/mongodb/log/fu3.log" --replSet setA --profile=1 --slowms=5  --shardsvr
+
+D:\mongodb\bin\mongo.exe admin --port 10000
+
+
+config={_id: 'setA', members:[{_id: 0,host:'127.0.0.1:10000'},{_id:1,host:'127.0.0.1:10001',arbiterOnly:true},{_id:2,host:'127.0.0.1:10002'}]}
+
+"_id": 副本集的名称
+"members": 副本集的服务器列表
+	"_id": 服务器的唯一ID
+	"host": 服务器主机
+	"priority": 是优先级，默认为1，优先级0为被动节点，不能成为活跃节点。优先级不位0则按照有大到小选出活跃节点。
+	"arbiterOnly": 仲裁节点，只参与投票，不接收数据，也不能成为活跃节点。
+	arbiterOnly:true
+
+
+rs.initiate(config);
+
+#查看状态
+rs.status()
+
+#添加仲裁节点
+rs.addArb("127.0.0.1:10002")
+#添加节点
+rs.add("127.0.0.1:10002")
+#删除节点
+rs.remove("127.0.0.1:10002")
+
+#查看复制的情况
+db.printSlaveReplicationInfo()
+
+#可读
+rs.slaveOk()
+
+#测试同步
+use test
+
+for(var i=1000;i<2000;i++){db.test.insert({"name":"test"+i,"age":123})}
+
+#测试故障
+#关闭
+mmm:PRIMARY> use admin
+switched to db admin
+mmm:PRIMARY> db.shutdownServer()
+
+
+#python pymongodb
+http://fanyi.myyoudao.com/WebpageTranslate?url=http%3A%2F%2Fapi.mongodb.com%2Fpython%2Fcurrent%2Fapi%2Fpymongo%2Fmongo_client.html&type=EN2ZH_CN&keyfrom=webfanyi.changelink
+
+===================================================================================
+
+分片
+
+Shard Server
+D:\mongodb\bin\mongod.exe --port 10010 --dbpath "F:/bin/mongodb/shard/n1" --logpath "F:/bin/mongodb/log/n1.log"   
+
+D:\mongodb\bin\mongod.exe --port 10011 --dbpath "F:/bin/mongodb/shard/n2" --logpath "F:/bin/mongodb/log/n2.log"  
+
+
+Config Server
+D:\mongodb\bin\mongod.exe  --port 10012 --dbpath "F:/bin/mongodb/shard/nc" --logpath "F:/bin/mongodb/log/nc.log" 
+
+
+Route Process
+D:\mongodb\bin\mongos.exe --port 10013 --configdb 127.0.0.1:10012 --logpath "F:/bin/mongodb/log/route.log" --chunkSize 500
+
+#客户端
+D:\mongodb\bin\mongo.exe admin --port 10013
+
+#添加Shard#添加Shard节点
+
+db.runCommand({addshard:"127.0.0.1:10010",allowLocal:true});
+db.runCommand({addshard:"127.0.0.1:10011",allowLocal:true});
+
+
+#启动分片
+db.runCommand({"enablesharding":"test"})
+db.runCommand({"shardcollection":"test.person","key":{"_id":"hashed"}})
+
+#添加表
+for (i = 2000; i < 3000; i++) {
+	db.person.insert({
+			"i": i,
+			"name": "user" + i,
+			"age": Math.floor(Math.random() * 120),
+			"created": new Date()
+	});
+}
+
+=================================================================
+
+
+D:\mongodb\bin\mongo.exe admin --port 27020
+config={_id:"retA",members:[{"_id": 0,host:"127.0.0.1:27020"},{"_id":1,host:"127.0.0.1:27021"},{"_id":2,host:"127.0.0.1:27022"},{"_id":3,host:"127.0.0.1:27023"}]}
+
+rs.initiate(config)
+
+
+#添加Shard节点
+
+sh.addShard("retA/localhost:27020")
+
+db.runCommand({addshard:"localhost:27020",allowLocal:true});
+db.runCommand({addshard:"localhost:27021",allowLocal:true});
+db.runCommand({addshard:"localhost:27022",allowLocal:true});
+db.runCommand({addshard:"localhost:27023",allowLocal:true});
+
+#启动分片
+db.runCommand({"enablesharding":"test"})
+
+#添加表
+for (i = 1; i < 10000; i++) {
+	db.person.insert({
+			"i": i,
+			"name": "user" + i,
+			"age": Math.floor(Math.random() * 120),
+			"created": new Date()
+	});
+}
+
+#【如果出现"errmsg" : "please create an index that starts with the shard key before sharding."，请创建索引】
+#以i和username为分片键,那么首先创建索引
+db.users.createIndex({i:1,username:1})
+#开启分片
+sh.shardCollection("test.users",{"i":1,"username":1})
+
+#sharding not enabled for db test
+
+
+
+#查看状态
+#配置服务
+D:\mongodb\bin\mongo.exe admin --port 27100
+
+
+查看分区情况
+
+use admin
+db.printShardingStatus()
+
+#对应的分片中查看
+D:\mongodb\bin\mongo.exe admin --port 27020
+db.users.getShardDistribution()
+db.users.stats();
+
+
+
