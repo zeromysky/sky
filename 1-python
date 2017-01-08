@@ -1,0 +1,671 @@
+/----
+python
+----/
+#!/usr/bin/python 解释器
+# -*- coding: UTF-8 -*-  编码 2.7
+
+【标识符】
+
+标识符有字母、数字、下划线组成。
+
+所有标识符可以包括英文、数字以及下划线（_），但不能以数字开头。
+
+标识符是区分大小写的。
+
+以下划线开头的标识符是有特殊意义的。
+以单下划线开头（_foo）的代表不能直接访问的类属性，
+需通过类提供的接口进行访问，不能用"from xxx import *"而导入；
+
+以双下划线开头的（__foo）代表类的私有成员；
+以双下划线开头和结尾的（__foo__）代表python里特殊方法专用的标识，如
+__init__（）代表类的构造函数。
+
+【保留字符】
+
+所有Python的关键字只包含小写字母。
+and	exec	not
+assert	finally	or
+break	for	pass
+class	from	print
+continue	global	raise
+def	if	return
+del	import	try
+elif	in	while
+else	is	with
+except	lambda	yield
+
+
+【行和缩进】
+
+代码块不使用大括号（{}）来控制类，函数以及其他逻辑判断。
+python最具特色的就是用缩进来写模块。
+
+缩进的空白数量是可变的，但是所有代码块语句必须包含相同的缩进空白数量
+
+if True:
+    print "True"
+else:
+  print "False"
+
+【多行语句】
+
+total = item_one + \
+        item_two + \
+        item_three
+
+【引号】
+word = 'word'
+sentence = "这是一个句子。"
+paragraph = """这是一个段落。
+包含了多个语句"""
+
+【变量赋值】
+
+变量赋值不需要类型声明。
+每个变量在内存中创建，都包括变量的标识，名称和数据这些信息。
+每个变量在使用前都必须赋值，变量赋值以后该变量才会被创建。
+等号（=）用来给变量赋值。
+
+counter = 100 # 赋值整型变量
+miles = 1000.0 # 浮点型
+name = "John" # 字符串
+
+a = b = c = 1 
+a, b, c = 1, 2, "john" 
+
+
+【五个标准的数据类型】
+
+	Numbers（数字）
+	String（字符串）
+	List（列表）
+	Tuple（元组）
+	Dictionary（字典）
+
+
+
+
+【Numbers（数字）】
+创建
+var1 = 1
+
+del语句删除一些对象的引用。
+del var1[,var2[,var3[....,varN]]]] 
+
+int（有符号整型）
+long（长整型[也可以代表八进制和十六进制]）
+float（浮点型）
+complex（复数） 
+
+
+int(x [,base ])         将x转换为一个整数  
+long(x [,base ])        将x转换为一个长整数  
+float(x )               将x转换到一个浮点数  
+complex(real [,imag ])  创建一个复数  
+str(x )                 将对象 x 转换为字符串  
+repr(x )                将对象 x 转换为表达式字符串  
+eval(str )              用来计算在字符串中的有效Python表达式,并返回一个对象  
+tuple(s )               将序列 s 转换为一个元组  
+list(s )                将序列 s 转换为一个列表  
+chr(x )                 将一个整数转换为一个字符  
+unichr(x )              将一个整数转换为Unicode字符  
+ord(x )                 将一个字符转换为它的整数值  
+hex(x )                 将一个整数转换为一个十六进制字符串  
+oct(x )                 将一个整数转换为一个八进制字符串  
+
+
+import random
+
+随机生成下一个实数，它在[0,1)范围内。
+random() 	
+
+输出 100 <= number < 1000 间的偶数
+print "randrange(100, 1000, 2) : ", random.randrange(100, 1000, 2)
+
+【字符串】
+
+Python不支持单字符类型，单字符也在Python也是作为一个字符串使用。
+
+var2 = "Python Runoob"
+print "var2[1:5]: ", var2[1:5] #var2[1:5]:  ytho
+
+转义字符	描述
+\		(在行尾时) 	续行符
+\\ 		反斜杠符号
+\' 		单引号
+\" 		双引号
+\a 		响铃
+\b 		退格(Backspace)
+\e 		转义
+\000 	空
+\n 		换行
+\v 		纵向制表符
+\t 		横向制表符
+\r 		回车
+\f 		换页
+\oyy 	八进制数，yy代表的字符，例如：\o12代表换行
+\xyy 	十六进制数，yy代表的字符，例如：\x0a代表换行
+\other 	其它的字符以普通格式输出
+
+
+操作符		描述			实例
++		字符串连接					>>>a + b 'HelloPython'
+*		重复输出字符串				>>>a * 2 'HelloHello'
+[]		通过索引获取字符串中字符	>>>a[1] 'e'
+[ : ]	截取字符串中的一部分		>>>a[1:4] 'ell'
+in		成员运算符 - 如果字符串中包含给定的字符返回 True 	>>>"H" in a True
+not in 	成员运算符 - 如果字符串中不包含给定的字符返回 True 	>>>"M" not in a True
+r/R		原始字符串 - 原始字符串：所有的字符串都是直接按照字面的意思来使用，没有转义特殊或不能打印的字符。 原始字符串除在字符串的第一个引号前加上字母"r"（可以大小写）以外，与普通字符串有着几乎完全相同的语法。	
+>>>print r'\n' \n >>> print R'\n' \n
+
+
+格式化
+
+print "My name is %s and weight is %d kg!" % ('Zara', 21) # My name is Zara and weight is 21 kg!
+
+符  号 		描述
+  %c	 格式化字符及其ASCII码
+  %s	 格式化字符串
+  %d	 格式化整数
+  %u	 格式化无符号整型
+  %o	 格式化无符号八进制数
+  %x	 格式化无符号十六进制数
+  %X	 格式化无符号十六进制数（大写）
+  %f	 格式化浮点数字，可指定小数点后的精度
+  %e	 用科学计数法格式化浮点数
+  %E	 作用同%e，用科学计数法格式化浮点数
+  %g	 %f和%e的简写
+  %G	 %f 和 %E 的简写
+  %p	 用十六进制数格式化变量的地址
+
+
+
+
+#把字符串的第一个字符大写
+string.capitalize() 
+#返回一个原字符串居中,并使用空格填充至长度 width 的新字符串
+string.center(width)
+#返回 str 在 string 里面出现的次数，如果 beg 或者 end 指定则返回指定范围内 str 出现的次数
+string.count(str, beg=0, end=len(string))
+
+#encoding 指定的编码格式解码 string，如果出错默认报一个 ValueError 的 异 常 ， 
+#除 非 errors 指 定 的 是 'ignore' 或 者'replace'
+string.decode(encoding='UTF-8', errors='strict')
+
+#以 encoding 指定的编码格式编码 string，如果出错默认报一个ValueError 的异常，
+#除非 errors 指定的是'ignore'或者'replace'
+string.encode(encoding='UTF-8', errors='strict')
+	
+#把字符串 string 中的 tab 符号转为空格，tab 符号默认的空格数是 8。
+string.expandtabs(tabsize=8)
+	
+
+#检测 str 是否包含在 string 中，
+#如果 beg 和 end 指定范围，则检查是否包含在指定范围内，
+#如果是返回开始的索引值，否则返回-1
+string.find(str, beg=0, end=len(string))
+	
+#跟find()方法一样，只不过如果str不在 string中会报一个异常.
+string.index(str, beg=0, end=len(string))
+	
+#以 string 作为分隔符，将 seq 中所有的元素(的字符串表示)合并为一个新的字符串
+string.join(seq)
+	
+#返回一个原字符串左对齐,并使用空格填充至长度 width 的新字符串
+string.ljust(width)
+	
+#转换 string 中所有大写字符为小写.
+string.lower()
+	
+#截掉 string 左边的空格
+string.lstrip()
+	
+#返回字符串 str 中最大的字母。
+max(str)
+
+#返回字符串 str 中最小的字母。
+min(str)
+	
+#有点像 find()和 split()的结合体,从 str 出现的第一个位置起,把 字 符 串 string 分 成 一 个 3 元 素 的 元 组 (string_pre_str,str,string_post_str),如果 string 中不包含str 则 string_pre_str == string.
+string.partition(str)
+	
+#把 string 中的 str1 替换成 str2,如果 num 指定，则替换不超过 num 次.
+string.replace(str1, str2,  num=string.count(str1))
+	
+#类似于 find()函数，不过是从右边开始查找.
+string.rfind(str, beg=0,end=len(string) )
+	
+#类似于 index()，不过是从右边开始.
+string.rindex( str, beg=0,end=len(string))
+	
+#返回一个原字符串右对齐,并使用空格填充至长度 width 的新字符串
+string.rjust(width)
+	
+#类似于 partition()函数,不过是从右边开始查找.
+string.rpartition(str)
+	
+#删除 string 字符串末尾的空格.
+string.rstrip()
+	
+#以 str 为分隔符切片 string，如果 num有指定值，则仅分隔 num 个子字符串
+string.split(str="", num=string.count(str))
+	
+
+
+string.splitlines(num=string.count('\n'))
+	
+
+按照行分隔，返回一个包含各行作为元素的列表，如果 num 指定则仅切片 num 个行.
+
+string.startswith(obj, beg=0,end=len(string))
+	
+
+检查字符串是否是以 obj 开头，是则返回 True，否则返回 False。如果beg 和 end 指定值，则在指定范围内检查.
+
+string.strip([obj])
+	
+
+在 string 上执行 lstrip()和 rstrip()
+
+string.swapcase()
+	
+
+翻转 string 中的大小写
+
+string.title()
+	
+
+返回"标题化"的 string,就是说所有单词都是以大写开始，其余字母均为小写(见 istitle())
+
+string.translate(str, del="")
+	
+
+根据 str 给出的表(包含 256 个字符)转换 string 的字符,
+
+要过滤掉的字符放到 del 参数中
+
+string.upper()
+	
+
+转换 string 中的小写字母为大写
+
+string.zfill(width)
+	
+
+返回长度为 width 的字符串，原字符串 string 右对齐，前面填充0
+
+string.isdecimal()
+	
+
+isdecimal()方法检查字符串是否只包含十进制字符。这种方法只存在于unicode对象。 
+
+【序列】
+
+数据结构式通过某种方式(例如对元素进行编号)组织在一起的数据元素的集合
+在Python中，最基本的数据结构是序列(sequence)。
+序列中的每个元素被分配一个序号--即元素的位置，也称为索引。
+第一个元素索引是0，第二个则是1，一次类推。
+
+Python包含6中内建的序列，即列表、元组、字符串、Unicode字符串、buffer对象和xrange对象。
+
+通用序列操作：索引、分片、序列相加、乘法、成员资格、长度、最小值和最大值
+
+ 索引
+>>> greeting='Hello'  
+>>> greeting[2]  
+'l'  
+
+ 分片
+>>> number=[1,2,3,4,5,6,7,8,9,10]  
+>>> number[2:4] #取索引为第二和第三的元素  
+[3, 4]  
+>>> number[-4:-1] #负数表明是从右开始计数  
+[7, 8, 9]  
+>>> number[-4:] #把第二个索引置空，表明包括到序列结尾的元素  
+[7, 8, 9, 10]  
+>>> number[:3] #同上，把第一个索引置空，表明包含序列开始的元素  
+[1, 2, 3]  
+>>> number[0:10:1] #默认在分片的时候，步长为1,这样指定步长为1，和默认的效果一样  
+[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]  
+>>> number[0:10:2] #这里指定步长为2，这样就会跳过某些序列元素  
+[1, 3, 5, 7, 9]  
+>>> number[10:0:-1] #步长也可以是负数，但是第一个索引一定要大于第二个索引  
+[10, 9, 8, 7, 6, 5, 4, 3, 2]  
+>>> number[10:0:-2]   
+[10, 8, 6, 4, 2]  
+
+ 序列相加
+
+>>> [1,2,3]+[4,5,6]  
+[1, 2, 3, 4, 5, 6]  
+
+ 乘法
+
+>>> 'python'*4  
+'pythonpythonpythonpython'  
+>>> [None]*4 #None为Python的内建值，这里创建长度为4的元素空间，但是什么元素也不包含  
+[None, None, None, None]  
+
+ 成员资格
+
+>>> permission='rw'  
+>>> 'r' in permission  
+True  
+>>> 'x' in permission  
+False  
+
+ 长度、最小值和最大值
+
+>>> number=[2,3,4,5,6,7,8,9,10]  
+>>> len(number)  
+9  
+>>> min(number)  
+2  
+>>> max(number)  
+10  
+>>> min(4,3,5) #函数的参数不用一定是序列，也可以是多个数字  
+3  
+
+【列表】
+
+list1 = ['physics', 'chemistry', 1997, 2000];
+更新
+list[2] = 2001;
+删除
+del list1[2];
+
+Python 表达式					结果 							描述
+len([1, 2, 3])					3								长度
+[1, 2, 3] + [4, 5, 6]			[1, 2, 3, 4, 5, 6]				组合
+['Hi!'] * 4						['Hi!', 'Hi!', 'Hi!', 'Hi!']	重复
+3 in [1, 2, 3]					True							元素是否存在于列表中
+for x in [1, 2, 3]: print x,	1 2 3							迭代
+
+#将元组转换为列表
+list(seq)
+#在列表末尾添加新的对象
+list.append(obj)
+#统计某个元素在列表中出现的次数
+list.count(obj)
+#在列表末尾一次性追加另一个序列中的多个值（用新列表扩展原来的列表）
+list.extend(seq)
+#从列表中找出某个值第一个匹配项的索引位置
+list.index(obj)
+#将对象插入列表
+list.insert(index, obj)
+#移除列表中的一个元素（默认最后一个元素），并且返回该元素的值
+list.pop(obj=list[-1])
+#移除列表中某个值的第一个匹配项
+list.remove(obj)
+#反向列表中元素
+list.reverse()
+#对原列表进行排序
+list.sort([func])
+
+
+【元组】
+
+tup1 = ('physics', 'chemistry', 1997, 2000);
+
+创建空元组
+tup1 = ();
+元组中只包含一个元素时，需要在元素后面添加逗号
+tup1 = (50,);
+
+元组中的元素值是（不允许修改）的，但我们可以对元组进行连接组合
+tup1 = (12, 34.56);
+tup2 = ('abc', 'xyz');
+# 创建一个新的元组
+tup3 = tup1 + tup2;
+
+
+元组中的元素值是（不允许删除）的，但我们可以使用del语句来删除整个元组，
+del tup;
+
+
+Python 表达式					结果 							描述
+len((1, 2, 3))					3								计算元素个数
+(1, 2, 3) + (4, 5, 6)			(1, 2, 3, 4, 5, 6)				连接
+('Hi!',) * 4					('Hi!', 'Hi!', 'Hi!', 'Hi!')	复制
+3 in (1, 2, 3)					True							元素是否存在
+for x in (1, 2, 3): print x,	1 2 3							迭代 
+
+任意无符号的对象，以逗号隔开，默认为元组
+print 'abc', -4.24e93, 18+6.6j, 'xyz';
+x, y = 1, 2;
+print "Value of x , y : ", x,y;
+
+#将列表转换为元组。
+tuple(seq)
+
+
+【字典】
+
+
+dict = {'Name': 'Zara', 'Age': 7, 'Class': 'First'};
+修改
+dict['Age'] = 8; # update existing entry
+dict['School'] = "DPS School"; # Add new entry
+删除
+del dict['Name']; # 删除键是'Name'的条目
+dict.clear();     # 清空词典所有条目
+del dict ;        # 删除词典
+
+#计算字典元素个数，即键的总数。
+len(dict)
+#输出字典可打印的字符串表示。
+str(dict)
+#返回输入的变量类型，如果变量是字典就返回字典类型。
+type(variable)
+
+
+#删除字典内所有元素
+radiansdict.clear()
+#返回一个字典的浅复制
+radiansdict.copy()
+#创建一个新字典，以序列seq中元素做字典的键，val为字典所有键对应的初始值
+radiansdict.fromkeys()
+#返回指定键的值，如果值不在字典中返回default值
+radiansdict.get(key, default=None)
+#如果键在字典dict里返回true，否则返回false
+radiansdict.has_key(key)
+#以列表返回可遍历的(键, 值) 元组数组
+radiansdict.items()
+#以列表返回一个字典所有的键
+radiansdict.keys()
+#和get()类似, 但如果键不存在于字典中，将会添加键并将值设为default
+radiansdict.setdefault(key, default=None)
+#把字典dict2的键/值对更新到dict里
+radiansdict.update(dict2)
+#以列表返回字典中的所有值
+radiansdict.values()
+
+
+【条件语句】
+num = 5     
+if num == 3:            # 判断num的值
+    print 'boss'        
+elif num == 2:
+    print 'user'
+elif num == 1:
+    print 'worker'
+elif num < 0:           # 值小于零时输出
+    print 'error'
+else:
+    print 'roadman'     # 条件均不成立时输出
+
+【循环】
+1）
+count = 0
+while (count < 9):
+   print 'The count is:', count
+   count = count + 1
+
+print "Good bye!"
+
+2）
+for num in range(10,20):  # 迭代 10 到 20 之间的数字
+   for i in range(2,num): # 根据因子迭代
+      if num%i == 0:      # 确定第一个因子
+         j=num/i          # 计算第二个因子
+         print '%d 等于 %d * %d' % (num,i,j)
+         break            # 跳出当前循环
+   else:                  # 循环的 else 部分
+      print num, '是一个质数'
+
+3）
+for letter in 'Python':     # First Example
+   if letter == 'h':
+      break
+   print 'Current Letter :', letter
+
+4）
+for letter in 'Python':     # 第一个实例
+   if letter == 'h':
+      continue
+   print '当前字母 :', letter
+
+
+
+【时间】
+
+import time;  # 引入time模块
+
+ticks = time.time()
+print "当前时间戳为:", ticks
+
+
+# 格式化成2016-03-20 11:45:39形式
+print time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) 
+2016-04-07 10:25:09
+
+# 格式化成Sat Mar 28 22:24:24 2016形式
+print time.strftime("%a %b %d %H:%M:%S %Y", time.localtime()) 
+Thu Apr 07 10:25:09 2016
+
+# 将格式字符串转换为时间戳
+a = "Sat Mar 28 22:24:24 2016"
+print time.mktime(time.strptime(a,"%a %b %d %H:%M:%S %Y"))
+1459175064.0
+
+
+%y 两位数的年份表示（00-99）
+%Y 四位数的年份表示（000-9999）
+%m 月份（01-12）
+%d 月内中的一天（0-31）
+%H 24小时制小时数（0-23）
+%I 12小时制小时数（01-12）
+%M 分钟数（00=59）
+%S 秒（00-59）
+%a 本地简化星期名称
+%A 本地完整星期名称
+%b 本地简化的月份名称
+%B 本地完整的月份名称
+%c 本地相应的日期表示和时间表示
+%j 年内的一天（001-366）
+%p 本地A.M.或P.M.的等价符
+%U 一年中的星期数（00-53）星期天为星期的开始
+%w 星期（0-6），星期天为星期的开始
+%W 一年中的星期数（00-53）星期一为星期的开始
+%x 本地相应的日期表示
+%X 本地相应的时间表示
+%Z 当前时区的名称
+%% %号本身
+
+【函数】
+
+def printinfo( name, age = 35 ):
+   "打印任何传入的字符串"
+   print "Name: ", name;
+   print "Age ", age;
+   return; #不带参数值的return语句返回None。
+
+def foo(arg1,*tupleArg,**dictArg):
+    print "arg1=",arg1  #formal_args
+    print "tupleArg=",tupleArg  #()
+    print "dictArg=",dictArg    #[]
+
+foo("formal_args")
+
+匿名函数
+
+sum = lambda arg1, arg2: arg1 + arg2;
+ 
+# 调用sum函数
+print "相加后的值为 : ", sum( 10, 20 )
+print "相加后的值为 : ", sum( 20, 20 )
+
+
+【模块】
+
+# 导入模块
+import support
+ 
+# 现在可以调用模块里包含的函数了
+support.print_func("Zara")
+
+from modname import name1[, name2[, ... nameN]]
+from modname import *
+
+global
+
+Money = 2000
+def AddMoney():
+   # 想改正代码就取消以下注释:
+   # global Money
+   Money = Money + 1
+ 
+print Money
+AddMoney()
+print Money
+
+
+dir()函数
+
+返回回的列表容纳了在一个模块里定义的（所有模块，变量和函数）。
+
+reload()重载函数
+
+reload(sys)
+sys.setdefaultencoding('utf8')
+
+
+【输入】
+
+raw_input([prompt]) 函数从标准输入读取一个行，并返回一个字符串（去掉结尾的换行符）：
+
+str = raw_input("请输入：");
+print "你输入的内容是: ", str
+
+请输入：Hello Python！
+你输入的内容是:  Hello Python！
+
+
+input([prompt]) 函数和 raw_input([prompt]) 函数基本类似，
+但是 input 可以接收一个Python表达式作为输入，并将运算结果返回。
+
+
+str = input("请输入：");
+print "你输入的内容是: ", str
+
+请输入：[x*5 for x in range(2,10,2)]
+你输入的内容是:  [10, 20, 30, 40]
+
+【异常处理】
+try:
+<语句>        #运行别的代码
+except <名字>：
+<语句>        #如果在try部份引发了'name'异常
+except <名字>，<数据>:
+<语句>        #如果引发了'name'异常，获得附加的数据
+else:
+<语句>        #如果没有异常发生
+
+try:
+	pass
+except Exception, e:
+	raise
+else:
+	pass
+finally:
+	pass
