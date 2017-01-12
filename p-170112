@@ -1,0 +1,250 @@
+#!/usr/bin/python
+#-*-coding:utf-8-*-
+# 又拍云 CDN 刷新
+# 
+'''
+命令行参数
+-o 域名 例如：http://img.job1001.com
+-d 资源在域名下的路径 例如：/image/2014/1/ 
+-f 包含资源名的文件路径，内容一行一个(\n) 例如：/data/1/1.txt
+1111.jpg
+2222.jpg
+3333.png
+1111.css
+1111.js
+-s 资源名列表 用,号分割
+1111.jpg,2222.jpg,3333.png,1111.css,1111.js
+-t 为1时 测试输出资源路径
+
+注意：
+1) 	-f 和 -s 不可同时使用 如果同时使用 以 -s 为准
+2) 	使用 -s 或 -f 时
+	如果资源中带有路径  例如：/image/2014/1/1111.jpg  则 不用输入 -d
+	如果资源中带有域名路径  例如：http://img.job1001.com/image/2014/1/1111.jpg  则 不用输入 -d 和 -o
+3) -t 1  可以测试路径是否正确
+
+例如 
+python cdn_refresh.py -o "http://img105.job1001.com" -d "/upload/album/2014-10-15/" -s "1413365219_2nXOKIvE.jpg,1413356665_92tRIcY4.jpg"
+python cdn_refresh.py -o "http://img105.job1001.com" -d "/upload/album/2014-10-15/" -f "/data/1/1.txt"
+'''  
+#
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
+import urllib2,urllib,httplib
+import time,json,getopt
+import os
+
+#获取又拍云的空间服务
+def getBucketByUrl(url=None):
+	pass
+
+
+#http提交
+def httpPost(url,data=None):
+    req = urllib2.Request(url)
+    req.add_header('User-Agent','Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.82 Safari/537.36')
+    #ACCESS TOKEN 验证
+    if data!=None:
+    	data = urllib.urlencode(data)  
+    	pass
+    response = urllib2.urlopen(req,data)
+    html=response.read()
+    return html
+
+#cdn 刷新
+def cdn_url(bucket,urls):
+	pass
+
+#获取文件内容
+def getFileContent(file_path):
+	f_res = []
+	try:
+		f = open(file_path)
+		f_res = f.read().split('\n')
+	except Exception, e:
+		print 'read file error'
+		exit()
+	else:
+		pass
+	finally:
+		f.close()
+	return f_res
+	pass
+#写文件
+def file_put_contents (url,datastr,mode='w'):
+    f = open (url,mode) 
+    f.write(datastr)
+    f.close()
+#去格式
+def delFormat(list1):
+	content = []
+	if isinstance (list1,list) :
+		for line in list1:
+			line = line.strip()
+			line = line.strip('\n')
+			line = line.replace(' ', '')
+			content.append(line)
+			pass
+		pass
+	return content
+
+#调试输出
+def dump (var):
+    if isinstance(var,list) :
+        for i in var :
+            print i
+    elif isinstance(var,dict):
+        for i in var:
+			if isinstance(var[i],list):
+				print str(i)
+				for x in var[i]:
+					print x
+					pass
+			else:
+				print str(i)+":"+str(var[i])
+			pass
+    else:
+        print var
+    pass
+
+
+if __name__ == '__main__':
+
+	#接受命令行参数
+	inParam = {}
+	try:
+		opts, args = getopt.getopt(sys.argv[1:], "o:d:f:s:t:")
+	except getopt.GetoptError as err:
+		print str(err) 
+		exit()
+
+	for o,v in opts:
+		if o == '-o':
+			inParam['domain'] = v
+		if o == '-t':
+			inParam['test'] = v
+		if o == '-d':
+			inParam['domain_path'] = v
+		elif o == '-f':
+			inParam['file_path'] = v
+		elif o == '-s':
+			inParam['file_content'] = v
+		pass
+
+	if not inParam:
+		print 'The parameters you have entered are incorrect.'
+		print 'Please enter -o: domain name example http://img3.job1001.com '
+		print 'Please enter -d: domain_path name example /job/www/sss/img/ '
+		print 'Please enter -f: refresh file contains a list of files refresh example /usr/www/aaa/1.txt  OR -s: refresh file list example 1.jpg,2.jpg,3.jpg'
+		print 'Please enter -t: test print '
+		exit()
+
+	print 'input param'
+	print inParam
+
+
+	if 'file_path' not in inParam and 'file_content' not in inParam:
+		print 'Please enter -f: refresh file contains a list of files refresh  OR -s: refresh file list'
+		exit()
+
+	#测试
+	debug = 0
+	if 'test' in inParam:
+		debug = inParam['test']
+	
+	#路径
+	domain_path = ''
+	if 'domain_path' in inParam:
+		domain_path = inParam['domain_path']
+
+	#域名
+	domain = ''
+	if 'domain' in inParam:
+		domain = inParam['domain']
+
+	if domain_path!='' and domain=='':
+		print 'Please enter -o: domain name example http://img3.job1001.com '
+		exit()
+
+	file_content = []
+	if 'file_path' in inParam:
+		file_path = inParam['file_path']
+		if not os.path.isfile(file_path):
+			print '-f : path is incorrect'
+			exit()
+		file_content = getFileContent(file_path);
+
+	if 'file_content' in inParam:
+		del file_content
+		file_content = []
+		file_content = inParam['file_content']
+		file_content = file_content.split(',')
+		
+	#去掉格式
+	file_content = delFormat(file_content);
+
+	# print domain
+	# print domain_path
+	# print file_content
+
+	#完整路径 1
+	url_list = []
+	for x in file_content:
+		line = str(domain)+str(domain_path)+str(x)
+		url_list.append(line)
+		# dump(line)
+
+	url_list = list(set(url_list))
+
+	if debug=='1':
+		for x in url_list:
+			print x
+			pass
+		exit()
+		pass
+
+
+	# file_put_contents('2',str(url_list))
+	#完整路径 2
+	url_dict = {}
+	i = 0
+	y = 0
+	bucket = ''
+	for x in url_list:
+		
+		#域名
+		bucket = getBucketByUrl(url=x)
+		if bucket == '' or bucket == None: continue
+		# dump(bucket)
+		if bucket not in url_dict:
+			url_dict[bucket] = {}
+		i += 1
+		if y not in url_dict[bucket] :
+			url_dict[bucket][y] = []
+
+		url_dict[bucket][y].append(x)
+		if i>40:
+			i=0
+			y += 1
+		pass
+	pass
+	# file_put_contents('1',str(url_dict))
+
+	#开始提交
+	if url_dict:
+		x_urls = ''
+		for x_bucket in url_dict:
+			# print x_bucket
+			for z in url_dict[x_bucket]:
+				# print url_dict[x_bucket][z]
+				del x_urls
+				x_urls = "\n".join(url_dict[x_bucket][z])
+				x_res = cdn_url(x_bucket,x_urls)
+				# print x_res
+				pass
+			pass
+		
+		pass
+	
