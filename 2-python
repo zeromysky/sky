@@ -1,0 +1,393 @@
+/------
+python
+-------/
+
+任何对象都可以测试真值，用于if或while的条件或下面布尔运算的操作数。下面的值被视为假：
+
+None
+
+False
+
+任何数值类型的零，例如，0、 0L、0.0、 0j。
+
+任何空的序列，例如， ''、 ()、 []。
+
+任何空的映射，例如，{}。
+
+用户定义的类的实例，如果该类定义一个__nonzero__()或__len__()的方法，在该方法返回整数零或布尔值False时。[1]
+
+所有其他值都被视为真 — 所以许多类型的对象永远为真。
+
+除非另有说明，结果为布尔值的运算和内建函数总是返回0或False表示假，1或True表示真
+（重要的例外：布尔操作符or和and始终返回它们的一个操作数。）
+
+
+x or y  如果x为假，那么返回y，否则返回x   
+x and y     如果x为假，那么返回x，否则返回y  
+not x   如果x为假，那么返回True，否则返回False  
+
+<   严格地小于    
+<=  小于或等于    
+>   严格地大于    
+>=  大于或等于    
+==  等于   
+!=  不等于   
+is  对象的ID    
+is not  不同的对象ID      
+
+
+
+str.count(sub[, start[, end]])
+
+返回在[start, end]范围内的子串sub非重叠出现的次数。可选参数start和end都以切片表示法解释。
+
+str.decode([encoding[, errors]])
+
+使用 encoding 中注册的编解码器，对字符串进行解码。
+encoding默认为字符串的默认编码。可以给出errors以设置不同的错误处理方案。
+默认值是'strict'，意思是编码错误引发UnicodeError。
+其它可能的值有'ignore'、'replace'和任何其它通过codecs.register_error()注册的名称，请参阅编解码器基类。
+
+str.encode([encoding[, errors]])
+
+返回该字符串编码后的版本。默认编码是当前默认字符串编码。
+可以给出errors以设置不同的错误处理方案。
+errors的默认值是'strict'，意思编码错误引发一个UnicodeError。
+其它可能的值有'ignore'、 'replace'、'xmlcharrefreplace'、'backslashreplace'和
+通过codecs.register_error()注册的任何其它名称，请参阅编解码器基类。
+可能的编码列表，请参阅标准编码部分。
+
+str.find(sub[, start[, end]])
+
+返回在字符串中找到的子字符串sub的最低索引，使得sub包含在切片s[start:end]中。
+可选参数start和end作为切片表示法解释。如果未找到sub，则返回-1 。
+
+
+str.replace(old, new[, count])
+
+返回字符串的一个拷贝，其中所有的子串old通过new替换。
+如果指定了可选参数count，则只有前面的count个出现被替换。
+
+
+str.split([sep[, maxsplit]])¶
+
+返回字符串中的单词列表，使用sep作为分隔符字符串。
+如果给出maxsplit，则至多拆分maxsplit次（因此，列表中将最多有maxsplit+1个元素）。
+如果没有指定maxsplit或为-1，那么分割的数量没有限制（进行所有可能的分割）。
+
+如果给定了sep，连续的分隔符不分组在一起，并被视为空字符串进行分隔
+（例如，'1,,2'.split(',')返回['1', '', '2'])。
+sep参数可以由多个字符组成（例如，'1<>2<>3'.split('<>')返回['1', '2', '3'])。
+用指定的分隔符分隔空字符串返回['']。
+
+如果sep未指定或者为None，则采用一种不同的分隔算法：
+连续的空格被视为一个单一的分隔符，
+结果的开始或结尾将不包含空字符串即使该字符串有前导或尾随空白。
+因此，使用None分隔一个空字符串或只包含空白的字符串返回[]。
+
+例如，' 1  2   3  '.split()返回['1', '2', '3']，
+' 1  2   3  '.split (None, 1）返回['1', '2    3   ']。
+
+
+str.strip([chars])
+
+返回字符串的一个副本，删除前导和尾随字符。
+chars参数是一个字符串，指定要移除的字符集。
+如果省略或为None，则chars参数默认为删除空白字符。
+chars参数不是一个前缀或后缀；而是删除其值的所有组合：
+
+
+
+字符串的格式化操作
+print '%(language)s has %(number)03d quote types.' % \
+...       {"language": "Python", "number": 2}
+
+集合类型 — set
+集合对象是一个不同可哈希对象组成的无序集合。
+常见的使用包括成员测试、从序列中删除重复项和计算数学运算（如交、并、差和对称差）。
+（其它容器请参阅内建的字典、列表和元组类和collections模块。）
+
+
+
+
+内建函数 http://python.usyiyi.cn/translate/python_278/library/functions.html
+
+abs(x)
+返回一个数的绝对值。参数可以是普通的整数，长整数或者浮点数。如果参数是个复数，返回它的模。
+
+
+all(iterable)
+如果iterable的所有元素为真（或者iterable为空）， 返回True。等同于：
+
+def all(iterable):
+    for element in iterable:
+        if not element:
+            return False
+    return True
+
+
+any(iterable)
+如果iterable的任一元素为真，返回True。如果iterable为空，返回False。等同于：
+
+def any(iterable):
+    for element in iterable:
+        if element:
+            return True
+    return False
+
+
+
+面试的时候尽量弄清楚公司文化以及管理手段。
+大家的工作时间一般很长或者较短？是不是时刻都是紧绷状态，
+产品是不是都按时发布？
+
+
+basestring()
+这个抽象类型是str和unicode的超类。 
+它不能被调用或者实例化，但是可以用来测试一个对象是否是str或者unicode的实例。 
+isinstance(obj, basestring)等同于isinstance(obj, (str, unicode))。
+
+
+
+cmp(x, y)
+比较两个对象x和y，根据结果返回一个整数。
+如果x < y，返回负数；
+如果x == y，返回0；
+如果x > y，返回正数。
+
+
+delattr(object, name)
+这个函数和setattr()有关。
+参数是一个对象和一个字符串。
+字符串必须是对象的某个属性的名字。
+只要对象允许，这个函数删除该名字对应的属性。
+例如，delattr(x, 'foobar')等同于del x.foobar。
+
+
+dir([object])
+
+如果没有参数，返回当前本地作用域内的名字列表。
+如果有参数，尝试返回参数所指明对象的合法属性的列表。
+如果对象有__dir__()方法，该方法被调用且必须返回一个属性列表。
+这允许实现了定制化的__getattr__()或者__getattribute__()函数的对象定制dir()报告对象属性的方式。
+如果对象没有提供__dir__()，同时如果对象有定义__dict__属性，
+dir()会先尝试从__dict__属性中收集信息，然后是对象的类型对象。如果对象是自定义的话，
+返回列表有可能不完整或不准确__getattr__()。
+对于不同类型的对象，默认的dir()行为也不同，因为它尝试产生相关的而不是完整的信息：
+	如果对象是模块对象，列表包含模块的属性名。
+	如果对象是类型或者类对象，列表包含类的属性名，及它的基类的属性名。
+	否则，列表包含对象的属性名，它的类的属性名和类的基类的属性名。
+
+
+enumerate(sequence, start=0)
+
+返回一个枚举对象。sequence必须是个序列，迭代器iterator，或者支持迭代的对象。
+enumerate()返回的迭代器的next()方法返回一个元组，
+它包含一个计数（从start开始，默认为0）和从sequence中迭代得到的值：
+
+>>> seasons = ['Spring', 'Summer', 'Fall', 'Winter']
+>>> list(enumerate(seasons))
+[(0, 'Spring'), (1, 'Summer'), (2, 'Fall'), (3, 'Winter')]
+
+
+等同于：
+
+def enumerate(sequence, start=0):
+    n = start
+    for elem in sequence:
+        yield n, elem
+        n += 1
+
+
+
+
+eval(expression[, globals[, locals]])
+
+参数是Unicode或者Latin-1编码的字符串，全局变量和局部变量可选。
+如果有全局变量，globals必须是个字典。如果有局部变量，locals可以是任何映射类型对象。
+
+改变于版本2.4：在此之前locals需要是个字典。
+
+expression参数被当作Python表达式来解析并演算（技术上来说，是个条件列表），
+使用globals和locals字典作为全局和局部的命名空间。
+如果globals字典存在，且缺少‘__builtins__’，在expression被解析之前，
+当前的全局变量被拷贝进globals。这意味着一般来说expression能完全访问标准__builtin__模块，
+且受限的环境会传播。如果locals字典被忽略，默认是globals字典。
+如果都被忽略，表达式在eval()被调用的环境中执行。
+返回值是被演算的表达式的结果。语法错误报告成异常。例子：
+>>>
+
+>>> x = 1
+>>> print eval('x+1')
+2
+
+该函数也能执行任意的代码对象（如compile()返回的结果）。 
+在这种情况下，传递代码对象而不是字符串。如果代码对象编译时mode参数为'exec'，eval()返回None。
+
+提示：exec语句支持动态的语句执行。execfile()函数支持执行文件中的语句。
+globals()和locals()函数返回当前的全局变量和局部变量的字典，可以传递给eval()或者execfile()。
+
+参见ast.literal_eval()，该函数能安全演算只含字面量的表达式的字符串。
+
+
+
+execfile(filename[, globals[, locals]])
+
+该函数类似于exec语句，它解析一个文件而不是字符串。
+它不同于import语句的地方在于它不使用模块管理——它无条件的读入文件且不会创建一个新模块。[1]
+
+参数是个文件名和两个可选的字典。
+文件被当成Python语句序列来解析并演算（类似于模块），使用globals和locals字典作为全局和局部的命名空间。
+如果存在，locals可以是任意的映射类型对象。
+记住在模块级别，全局和局部字典是同一个字典。
+如果globals和locals是两个不同的对象，代码就好象是嵌入在类定义中被执行。
+
+改变于版本2.4：在此之前locals必须是个字典。
+
+如果locals字典被忽略，默认是globals字典。
+如果两个字典都被忽略，表达式在execfile()被调用的环境中执行。返回None。
+
+注意
+
+默认的locals的行为和下述的locals()函数一样：不应该尝试修改默认的locals字典。
+如果在execfile()函数返回后，你希望看到作用于locals的代码的效果，显示地传递一个locals字典。
+ execfile()不能用于可靠地修改一个函数的局部变量。
+
+
+file(name[, mode[, buffering]])
+
+file类型的构造函数，进一步的描述见File Objects章节。
+构造函数的参数同下述的open()内置函数。
+
+要打开一个文件，建议使用open()而不是直接调用该构造函数。
+file更适合于类型测试（例如，isinstance(f, file)）。
+
+
+
+
+getattr(object, name[, default])
+
+返回object的属性值。name必须是个字符串。
+如果字符串是对象某个属性的名字，则返回该属性的值。
+例如，getattr(x, 'foobar')等同于x.foobar。
+如果名字指明的属性不存在，且有default参数，default被返回；否则抛出AttributeError。
+
+
+setattr(object, name, value)
+
+getattr()的相反操作。参数是一个对象、一个字符串和任何一个值。
+字符串可以是一个已存在属性的名字也可以是一个新属性的名字。
+该函数将值赋值给属性，只要对象允许。
+例如，setattr(x, 'foobar', 123)等同于x.foobar = 123。
+
+
+hasattr(object, name)
+
+参数是一个对象和一个字符串。
+如果字符串是对象某个属性的名字，返回True；否则返回False。
+（实现方式为调用getattr(object, name)，看它是否抛出异常）。
+
+
+
+isinstance(object, classinfo)¶
+
+如果参数object 是参数classinfo 的一个实例；或者是其一个（直接的、间接的或者virtual）子类的实例，
+返回真。如果classinfo是类型对象（新式类）而object是该类型对象；
+或者是其子类（直接的，间接的，或者virtual），返回真。
+如果object不是给定类型的类实例或者对象，该函数总是返回假。
+如果classinfo既不是类对象，也不是类型对象，它可以是类／类型对象的元组，
+或者递归包含这样的元组（不接受其它的序列类型）。
+如果classinfo不是类，类型，类／类型的元组，抛出TypeError异常。
+
+
+issubclass(class, classinfo)
+
+如果class是classinfo的子类（直接的，间接的，或者virtual) ，返回真。
+一个类被认为是它自己的子类。
+classinfo可以是类对象的元组，这时classinfo中的每个类对象都会被检查。
+其它情况下，抛出TypeError异常。
+
+
+map(function, iterable, ...)
+
+将function应用于iterable的每一个元素，返回结果的列表。
+如果有额外的iterable参数，并行的从这些参数中取元素，并调用function。
+如果一个参数比另外的要短，将以None扩展该参数元素。
+如果function是None使用特性函数；如果有多个参数，map()返回一元组列表，
+元组包含从各个参数中取得的对应的元素（某种变换操作）。
+iterable参数可以是序列或者任意可迭代对象；结果总是列表。
+
+
+
+print(*objects, sep=' ', end='\n', file=sys.stdout)
+
+以sep分割，end的值结尾，将对象打印到文件流中。sep, end 和 file，如果提供这三个参数的话，必须以键值的形式。
+
+所有非键值形式提供的参数，都被转化为字符串，就像用str()转化那样。
+然后写到 文件流中，以 sep 分割， end 结尾。sep and end 都必须是字符串形式的; 
+也可以留成 None, 这样会使用默认值。如果没有打印 对象, print() 只打印一个 结束符号 end.
+
+file 参数一定要是含有 write(string)方法的对象 ; 
+如果该参数为空，或为None, 默认使用sys.stdout 作为输出。输出缓冲方式由file决定。
+例如 ，使用file.flush() 来确保, 立即显示在屏幕上.
+
+
+
+range(stop)
+range(start, stop[, step])
+
+这是一个创建包含数列的列表的通用函数。
+它最常用于for循环。参数必须为普通的整数。如果step参数省略，则默认为1。
+如果start参数省略，则默认为0。
+该函数的完整形式返回一个整数列表[start, start + step, start + 2 * step, ...]。
+如果step为正，则最后一个元素start + i * step最大且小于stop；
+如果step为负，则最后一个元素start + i * step最小且大于stop。
+step必须不能为零（否则会引发ValueError）。示例：
+
+>>> range(10)
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+>>> range(1, 11)
+[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+
+str(object='')¶
+
+返回一个字符串，包含对象的友好的可打印表示形式。
+对于字符串，它返回字符串本身。
+与repr(object)的区别是str(object)不会永远试图返回一个eval()可接受的字符串；
+它的目标是返回一个可打印的字符串。
+如果没有给出参数，则返回空字符串''。
+
+
+type(object)
+type(name, bases, dict)
+
+只有一个参数时，返回object的类型。
+返回值是一个类型对象。
+建议使用内建函数isinstance()测试一个对象的类型。
+
+
+unicode(object='')
+unicode(object[, encoding[, errors]])
+
+使用下面的一种模式返回object的Unicode版字符串：
+
+如果给出encoding和/或errors参数，
+unicode()方法将解码对象，
+这个对象可以是8位字符串或使用encoding编解码器的字符缓冲区。
+encoding参数是一个表示编码名称的字符串；
+如果编码未知，则会引发LookupError错误。
+根据errors完成错误处理；这指定了在输入编码中无效字符串的处理方式。
+如果errors参数是'strict'（默认值），则会引发ValueError错误，
+如果是'ignoret'则导致错误被安静地忽略，如
+果是'replace'会导致使用官方的Unicode替代字符U+FFFD来替换不能被解码的输入字符串。另请参阅codecs模块。
+
+如果没有给出可选的参数，则unicode()将模仿str()的行为，
+但是它返回Unicode字符串而不是8位字符串。
+更确切地说，如果object是一个Unicode字符串或其子类，它将返回该Unicode字符串，而不应用任何其他解码。
+
+对于提供__ unicode __()方法的对象，将不带参数调用此方法来创建一个Unicode字符串。
+对于所有其他对象，要求提供8位字符串版本或表示，
+然后在'strict'模式下使用默认编码的编解码器将其转换为Unicode字符串。
+
+None 常用来表示缺少的值
